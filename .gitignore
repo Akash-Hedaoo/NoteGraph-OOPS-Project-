@@ -1,0 +1,42 @@
+# Compiled Source Code
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven Build Directories
+target/
+pom.xml.tag
+
+# OS Generated Files
+.DS_Store
+Thumbs.db
+
+# Local Logs & Databases
+*.log
+*.db
+*.mv.db
+*.sqlite
+*.sqlite3
+
+# IDE Configurations
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# VS Code / Antigravity
+.vscode/
+.antigravity/
+
+# Eclipse
+.settings/
+.project
+.classpath
+
+# Temp files
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
