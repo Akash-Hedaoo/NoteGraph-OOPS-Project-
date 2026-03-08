@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: notegraph
+  datasource:
+    # Aiven MySQL connection details
+    url: jdbc:mysql://168.144.20.191:17588/defaultdb?sslMode=REQUIRED
+    username: avnadmin
+    password: AVNS_pMrRF0zyEIxJCsmWrcS
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update # Auto-create/update tables based on entities
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  expiration: 86400000 # 24 hours in milliseconds
