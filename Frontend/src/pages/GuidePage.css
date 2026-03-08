@@ -1,0 +1,258 @@
+.guide-page {
+  padding: 24px 32px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+
+.guide-container {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* Header */
+.guide-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.guide-header-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+  flex-shrink: 0;
+}
+
+.guide-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-main);
+}
+
+.guide-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 4px 0 0;
+}
+
+/* Quick Start Banner */
+.quick-start-banner {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.08));
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+}
+
+.qs-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--primary-blue);
+  margin-bottom: 16px;
+}
+
+.qs-content h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.qs-content p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.qs-steps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-left: 32px;
+}
+
+.qs-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+
+.qs-arrow {
+  color: var(--text-secondary);
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+
+/* Guide Sections */
+.guide-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.guide-section {
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.guide-section:hover {
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.guide-section.expanded {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.guide-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.guide-section-header:hover {
+  background: var(--bg-hover);
+}
+
+.gsh-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.guide-icon-box {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.gsh-text h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.gsh-text span {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.gsh-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.step-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.gsh-chevron {
+  color: var(--text-secondary);
+  transition: transform 0.25s ease;
+}
+
+/* Section Body */
+.guide-section-body {
+  padding: 0 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--border-color);
+  margin-top: 0;
+  padding-top: 16px;
+}
+
+.guide-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 0;
+  position: relative;
+}
+
+.guide-step-item:not(:last-child) {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.guide-step-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 42px;
+  bottom: -2px;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--border-color), transparent);
+}
+
+.step-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.step-content h4 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.step-content p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+/* Footer */
+.guide-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 0 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  opacity: 0.6;
+}

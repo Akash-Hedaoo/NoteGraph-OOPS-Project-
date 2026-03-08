@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartNotes Search Interface</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#197fe6",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#111921",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e293b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<div class="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Header -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 bg-surface-light dark:bg-surface-dark px-10 py-3 shadow-sm z-20">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-slate-900 dark:text-white">
+<div class="size-8 text-primary">
+<svg class="w-full h-full" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 42.4379C4 42.4379 14.0962 36.0744 24 41.1692C35.0664 46.8624 44 42.2078 44 42.2078L44 7.01134C44 7.01134 35.068 11.6577 24.0031 5.96913C14.0971 0.876274 4 7.27094 4 7.27094L4 42.4379Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-xl font-bold leading-tight tracking-tight">SmartNotes</h2>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-8 items-center">
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium" href="#">Dashboard</a>
+<a class="text-slate-900 dark:text-slate-100 font-semibold text-sm" href="#">Search</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium" href="#">Notes</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium" href="#">Tasks</a>
+</nav>
+<div class="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
+<button class="relative bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-transparent hover:ring-primary transition-all" data-alt="User profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBqJoDSrE-cjI1SezJjM2ZJXrhOPP4-O-QMfso5L_XgwAiWjS-D3q0Dfm_bcT9c-J0gShZ0K5wxuYs4M7I0AlhHy9HLWsFtoKS_-imJtsZQ9O5I_6XQ5GOzyJGaSsdq4r_bYewFxtcbxZ31uDghgDbmNX-fpqsjNRuXLh8opV6nw4EZNeQqh2TsMvqC6da4yjizotF1Q3DWjLW7qOb6-5bxiYJFxCllwsvCFw12v7CAzH4M-1iYXvKG_lpElswuPZ80XUpCyvXh9l4");'></button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex justify-center py-8 px-4 sm:px-6 lg:px-8">
+<div class="w-full max-w-4xl flex flex-col gap-6">
+<!-- Search & Filter Container -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 p-6">
+<!-- Search Input -->
+<div class="relative group mb-6">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+<span class="material-symbols-outlined text-2xl">search</span>
+</div>
+<input autofocus="" class="block w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-primary/50 text-slate-900 dark:text-white placeholder-slate-400 rounded-xl focus:outline-none focus:ring-0 transition-all text-lg shadow-inner" placeholder="Search notes, tags, folders..." type="text" value="project alpha meeting"/>
+<div class="absolute inset-y-0 right-0 pr-4 flex items-center">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined text-xl">close</span>
+</button>
+</div>
+</div>
+<!-- Filters & Hints -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+<div class="flex flex-wrap gap-2">
+<button class="group flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-sm font-medium transition-colors border border-primary/20">
+<span class="material-symbols-outlined text-[18px]">label</span>
+                                Tags
+                                <span class="material-symbols-outlined text-[18px] opacity-70 group-hover:opacity-100">arrow_drop_down</span>
+</button>
+<button class="group flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium transition-colors">
+<span class="material-symbols-outlined text-[18px]">folder</span>
+                                Folders
+                                <span class="material-symbols-outlined text-[18px] opacity-70 group-hover:opacity-100">arrow_drop_down</span>
+</button>
+<button class="group flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium transition-colors">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                                Date Modified
+                                <span class="material-symbols-outlined text-[18px] opacity-70 group-hover:opacity-100">arrow_drop_down</span>
+</button>
+</div>
+<div class="flex items-center gap-3 text-xs text-slate-400 font-medium">
+<span class="flex items-center gap-1"><kbd class="px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-sans">↵</kbd> to select</span>
+<span class="flex items-center gap-1"><kbd class="px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-sans">Ctrl</kbd> + <kbd class="px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-sans">F</kbd> to focus</span>
+</div>
+</div>
+<!-- Results List -->
+<div class="mt-2 flex flex-col">
+<div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 mt-4 px-2">Best Matches</div>
+<!-- Result Item 1 (Active) -->
+<a class="group flex gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 border border-primary/20 transition-all cursor-pointer relative overflow-hidden" href="#">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="shrink-0 pt-1">
+<div class="size-10 rounded-lg bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-primary border border-primary/10">
+<span class="material-symbols-outlined">description</span>
+</div>
+</div>
+<div class="flex flex-1 flex-col gap-1 min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="text-primary font-semibold text-base truncate pr-4">Project Alpha Kickoff</h3>
+<span class="text-xs font-medium text-primary/80 whitespace-nowrap bg-primary/10 px-2 py-0.5 rounded-full">Work</span>
+</div>
+<p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed line-clamp-2">
+                                    ...discussing the timeline for the <strong class="text-slate-900 dark:text-white bg-yellow-200 dark:bg-yellow-900/50 px-0.5 rounded">project alpha</strong> launch. Key stakeholders present were Sarah from marketing and Mike from engineering...
+                                </p>
+<div class="flex items-center gap-3 mt-2 text-xs text-slate-400">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">folder_open</span>
+                                        Work / Projects
+                                    </span>
+<span class="size-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+<span>Last modified: Today at 10:00 AM</span>
+</div>
+</div>
+<div class="flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 top-1/2 -translate-y-1/2">
+<span class="material-symbols-outlined text-slate-400 hover:text-primary">arrow_forward</span>
+</div>
+</a>
+<!-- Result Item 2 -->
+<a class="group flex gap-4 p-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all cursor-pointer mt-2" href="#">
+<div class="shrink-0 pt-1">
+<div class="size-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined">description</span>
+</div>
+</div>
+<div class="flex flex-1 flex-col gap-1 min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="text-slate-900 dark:text-slate-100 font-semibold text-base truncate pr-4">Alpha Testing Protocol</h3>
+<span class="text-xs font-medium text-slate-500 whitespace-nowrap bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">Dev</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed line-clamp-2">
+                                    Standard procedures for running <strong class="text-slate-900 dark:text-white bg-yellow-200 dark:bg-yellow-900/50 px-0.5 rounded">project alpha</strong> unit tests. Ensure environment variables are set correctly before...
+                                </p>
+<div class="flex items-center gap-3 mt-2 text-xs text-slate-400">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">folder_open</span>
+                                        Dev / QA
+                                    </span>
+<span class="size-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+<span>Last modified: Yesterday</span>
+</div>
+</div>
+</a>
+<!-- Result Item 3 -->
+<a class="group flex gap-4 p-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all cursor-pointer mt-2" href="#">
+<div class="shrink-0 pt-1">
+<div class="size-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined">task_alt</span>
+</div>
+</div>
+<div class="flex flex-1 flex-col gap-1 min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="text-slate-900 dark:text-slate-100 font-semibold text-base truncate pr-4">Review Alpha Designs</h3>
+<span class="text-xs font-medium text-slate-500 whitespace-nowrap bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">Tasks</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed line-clamp-2">
+                                    Check the new Figma mockups for <strong class="text-slate-900 dark:text-white bg-yellow-200 dark:bg-yellow-900/50 px-0.5 rounded">project alpha</strong> dashboard. Provide feedback on the color palette.
+                                </p>
+<div class="flex items-center gap-3 mt-2 text-xs text-slate-400">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                        To Do
+                                    </span>
+<span class="size-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+<span>Due: Oct 24</span>
+</div>
+</div>
+</a>
+<!-- See all link -->
+<a class="mt-4 flex items-center justify-center gap-2 py-3 rounded-lg text-primary hover:bg-primary/5 transition-colors text-sm font-medium" href="#">
+                            See all 24 results for "project alpha"
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Helper Text -->
+<div class="text-center text-sm text-slate-400 dark:text-slate-500">
+<p>Tip: You can use search operators like <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-slate-600 dark:text-slate-300">tag:work</code> or <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-slate-600 dark:text-slate-300">is:task</code></p>
+</div>
+</div>
+</main>
+</div>
+</body></html>
