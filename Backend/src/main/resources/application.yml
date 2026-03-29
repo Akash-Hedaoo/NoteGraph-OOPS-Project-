@@ -1,11 +1,12 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: notegraph
   datasource:
-    # Aiven MySQL connection details
-    url: jdbc:mysql://168.144.20.191:17588/defaultdb?sslMode=REQUIRED
-    username: avnadmin
-    password: AVNS_pMrRF0zyEIxJCsmWrcS
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
