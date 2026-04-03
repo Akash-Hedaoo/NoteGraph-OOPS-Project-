@@ -1,0 +1,18 @@
+# Part 5: Reusable UI Kit & Design System
+
+**Files Discussed:**
+- `JavaUI/src/com/notegraph/ui/components/ColorScheme.java`
+- `JavaUI/src/com/notegraph/ui/components/RoundedPanel.java`
+- `JavaUI/src/com/notegraph/ui/components/PlaceholderTextField.java`
+- `JavaUI/src/com/notegraph/ui/components/ConfirmDialog.java`
+
+Professor, the final part of my explanation deals with the core components logic. A primary issue with Java Swing is that components aren't visually styled out of the box. Rather than writing duplicate styling logic across every view, I built a design system to centralize it.
+
+First, **`ColorScheme.java`** acts exactly like a CSS variable stylesheet. The logic here is static memory allocation. I declare variables like `public static final Color PRIMARY_BLUE` mapping exact RGB sequences. By keeping these static, my logic guarantees that every UI panel across the entire application references the same exact memory space. If I want to change the visual theme of the entire application, the logic only requires changing the constant in this final class. 
+The font logic executes within a static block at class load time. The logic queries the operating system via `GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()`. It loops through the returned native font array string against a preferred precedence list, checking if the OS supports modern web typography like 'Inter' or 'Roboto'. If a match is found, it instantiates and caches the font definitions centrally.
+
+In **`RoundedPanel.java`**, the logic overrides a massive chunk of Swing's default behavioral bounds. First, calling `setOpaque(false)` inside the constructor forcibly halts Windows or maxOS from natively drawing harsh 90-degree rectangle corners in the background layer. My overridden `paintComponent` algorithm immediately invokes `Graphics2D` and activates aliasing flags. Next, using dynamic $W = \text{getWidth()}$ and $H = \text{getHeight()}$ measurements, the drawing logic invokes `fillRoundRect(0, 0, w, h, radius, radius)`. This mathematical routine physically traces geometric arc contours acting as clipping structures. By routing all the standard data panels inside Part 4 to extend this class, they automatically inherit perfectly drawn, modern corners resembling CSS `border-radius`.
+
+In **`PlaceholderTextField.java`**, standard Swing text layers unfortunately lack an HTML5 placeholder equivalent. My logic uses polymorphism to solve this. Instead of extending `JTextField`, I dynamically inject a custom `BasicTextFieldUI` during construction. The core rendering routine overrides `protected void paintSafely(Graphics g)`. The exact if-logic calculates: `if (ref.getText().isEmpty() && !ref.hasFocus())`. When both conditions are true, the logic creates a `Graphics` string template. It pulls the vertical offset mathematically factoring in the font ascent boundary (`getAscent()`), and calls `g2.drawString(placeholderString, x, y)`—physically rendering light-gray translucent text acting as a watermark directly atop the component's unrendered buffer layer without interfering with the user's actual typed input stream.
+
+Finally, **`ConfirmDialog.java`** overrides legacy `JOptionPane` windows. The core routine implements `JDialog`. The specific behavioral logic implements `setUndecorated(true)` separating it entirely from host OS window borders. By setting `setModal(true)`, the logic enforces a blocking algorithm on the primary thread—it refuses to let the user click anything beneath it, pausing parent frame logic execution until the user resolves the dialog by picking either confirmation or cancellation integers, whereupon it disposes of itself and returns control context mathematically.
