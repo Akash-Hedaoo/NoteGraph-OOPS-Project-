@@ -165,6 +165,18 @@ public class ApiClient {
         return gson.fromJson(body, new TypeToken<List<ApiModels.ActivityLog>>(){}.getType());
     }
 
+    // ── AI Assistant ────────────────────────────────
+    public ApiModels.AiChatResponse chatWithAi(String wsId, ApiModels.AiChatRequest request) throws Exception {
+        String body = post("/ai/chat/" + wsId, gson.toJson(request));
+        return gson.fromJson(body, ApiModels.AiChatResponse.class);
+    }
+
+    public List<String> suggestTags(String wsId, String content) throws Exception {
+        String requestJson = "{\"content\":\"" + content.replace("\"", "\\\"").replace("\n", "\\n") + "\"}";
+        String body = post("/ai/tags/suggest/" + wsId, requestJson);
+        return gson.fromJson(body, new TypeToken<List<String>>(){}.getType());
+    }
+
     // ── HTTP Helpers ────────────────────────────────
     private String get(String path) throws Exception {
         HttpRequest.Builder builder = HttpRequest.newBuilder()

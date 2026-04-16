@@ -40,6 +40,11 @@ public class EditorPanel extends JPanel {
     private List<ApiModels.Tag> availableTags = new ArrayList<>();
     private ApiModels.Note currentNote;
 
+    // AI Fields
+    private JPanel aiChatPanel;
+    private JTextField aiInput;
+    private List<ApiModels.AiChatMessage> aiChatHistory = new ArrayList<>();
+
     public EditorPanel(Consumer<String> onNavigate) {
         this.onNavigate = onNavigate;
         setLayout(new BorderLayout());
@@ -170,6 +175,17 @@ public class EditorPanel extends JPanel {
         addTagBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         addTagBtn.addActionListener(e -> showAddTagDialog());
         tagsRow.add(addTagBtn);
+        
+        JButton suggestTagsBtn = new JButton("✨ Suggest tags");
+        suggestTagsBtn.setFont(new Font(ColorScheme.FONT_REGULAR.getFamily(), Font.PLAIN, 12));
+        suggestTagsBtn.setForeground(ColorScheme.PRIMARY_BLUE);
+        suggestTagsBtn.setBorderPainted(false);
+        suggestTagsBtn.setFocusPainted(false);
+        suggestTagsBtn.setBackground(null);
+        suggestTagsBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        suggestTagsBtn.addActionListener(e -> applyAiTagSuggestions());
+        tagsRow.add(suggestTagsBtn);
+
         canvas.add(tagsRow);
         canvas.add(Box.createVerticalStrut(8));
 
@@ -284,7 +300,35 @@ public class EditorPanel extends JPanel {
         noRelated.setForeground(ColorScheme.TEXT_SECONDARY);
         relatedNotesPanel.add(noRelated);
         rightSidebar.add(relatedNotesPanel);
-        rightSidebar.add(Box.createVerticalGlue());
+        
+        // AI Assistant
+        rightSidebar.add(Box.createVerticalStrut(20));
+        JLabel aiTitle = new JLabel("✨ AI ASSISTANT");
+        aiTitle.setFont(new Font(ColorScheme.FONT_SEMIBOLD.getFamily(), Font.BOLD, 11));
+        aiTitle.setForeground(ColorScheme.PRIMARY_BLUE);
+        aiTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        rightSidebar.add(aiTitle);
+        rightSidebar.add(Box.createVerticalStrut(8));
+
+        aiChatPanel = new JPanel();
+        aiChatPanel.setLayout(new BoxLayout(aiChatPanel, BoxLayout.Y_AXIS));
+        aiChatPanel.setOpaque(false);
+        JScrollPane aiScroll = new JScrollPane(aiChatPanel);
+        aiScroll.setBorder(null);
+        aiScroll.setOpaque(false);
+        aiScroll.getViewport().setOpaque(false);
+        aiScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
+        rightSidebar.add(aiScroll);
+
+        rightSidebar.add(Box.createVerticalStrut(8));
+        aiInput = new JTextField();
+        aiInput.putClientProperty("JTextField.placeholderText", "Ask about this note...");
+        aiInput.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        aiInput.setAlignmentX(Component.LEFT_ALIGNMENT);
+        aiInput.addActionListener(e -> handleAiChatSubmit());
+        rightSidebar.add(aiInput);
+
+        rightSidebar.add(Box.createVerticalStrut(8));
 
         mainLayout.add(rightSidebar, BorderLayout.EAST);
         add(mainLayout, BorderLayout.CENTER);
@@ -540,6 +584,17 @@ public class EditorPanel extends JPanel {
         addTagBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         addTagBtn.addActionListener(e -> showAddTagDialog());
         tagsRow.add(addTagBtn);
+        
+        JButton suggestTagsBtn = new JButton("✨ Suggest tags");
+        suggestTagsBtn.setFont(new Font(ColorScheme.FONT_REGULAR.getFamily(), Font.PLAIN, 12));
+        suggestTagsBtn.setForeground(ColorScheme.PRIMARY_BLUE);
+        suggestTagsBtn.setBorderPainted(false);
+        suggestTagsBtn.setFocusPainted(false);
+        suggestTagsBtn.setBackground(null);
+        suggestTagsBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        suggestTagsBtn.addActionListener(e -> applyAiTagSuggestions());
+        tagsRow.add(suggestTagsBtn);
+
         tagsRow.revalidate();
         tagsRow.repaint();
     }
@@ -586,6 +641,101 @@ public class EditorPanel extends JPanel {
                 } catch (Exception e) {
                     titleField.setText("Error loading note");
                 }
+            }
+        }.execute();
+    }
+
+    // ── AI Methods ──────────────────────────────────
+    private void appendAiMessage(String role, String text) {
+        JLabel msgLabel = new JLabel("<html><p style='width: 200px; padding: 4px;'>" + text.replace("\n", "<br>") + "</p></html>");
+        msgLabel.setFont(new Font(ColorScheme.FONT_REGULAR.getFamily(), Font.PLAIN, 12));
+        if ("user".equals(role)) {
+            msgLabel.setForeground(ColorScheme.TEXT_PRIMARY);
+            msgLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        } else {
+            msgLabel.setForeground(ColorScheme.PRIMARY_BLUE);
+            msgLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        }
+        aiChatPanel.add(msgLabel);
+        aiChatPanel.add(Box.createVerticalStrut(8));
+        aiChatPanel.revalidate();
+        aiChatPanel.repaint();
+    }
+
+    private void handleAiChatSubmit() {
+        String query = aiInput.getText().trim();
+        if (query.isEmpty() || noteId == null) return;
+        aiInput.setText("");
+
+        aiChatHistory.add(new ApiModels.AiChatMessage("user", query));
+        appendAiMessage("user", query);
+
+        JLabel loadingLabel = new JLabel("Thinking...");
+        loadingLabel.setFont(new Font(ColorScheme.FONT_REGULAR.getFamily(), Font.ITALIC, 11));
+        loadingLabel.setForeground(ColorScheme.TEXT_SECONDARY);
+        aiChatPanel.add(loadingLabel);
+        aiChatPanel.revalidate();
+        aiChatPanel.repaint();
+
+        ApiModels.AiChatRequest req = new ApiModels.AiChatRequest();
+        req.currentNoteId = noteId;
+        req.currentNoteTitle = titleField.getText();
+        req.currentNoteContent = getEditorContent();
+        req.currentTags = noteTags.stream().map(t -> t.id).toList();
+        req.history = new ArrayList<>(aiChatHistory);
+
+        new SwingWorker<ApiModels.AiChatResponse, Void>() {
+            @Override protected ApiModels.AiChatResponse doInBackground() throws Exception {
+                return ApiClient.get().chatWithAi(ApiClient.get().getWorkspaceId(), req);
+            }
+            @Override protected void done() {
+                aiChatPanel.remove(loadingLabel);
+                try {
+                    ApiModels.AiChatResponse res = get();
+                    aiChatHistory.add(new ApiModels.AiChatMessage("model", res.answer));
+                    appendAiMessage("model", res.answer);
+                } catch (Exception e) {
+                    appendAiMessage("model", "Error: " + e.getMessage());
+                }
+            }
+        }.execute();
+    }
+
+    private void applyAiTagSuggestions() {
+        if (noteId == null) return;
+        String content = getEditorContent();
+        
+        JLabel loading = new JLabel(" ✨...");
+        loading.setFont(new Font(ColorScheme.FONT_REGULAR.getFamily(), Font.PLAIN, 12));
+        tagsRow.add(loading);
+        tagsRow.revalidate();
+        tagsRow.repaint();
+
+        new SwingWorker<List<String>, Void>() {
+            @Override protected List<String> doInBackground() throws Exception {
+                if(availableTags.isEmpty()){
+                    availableTags = ApiClient.get().getWorkspaceTags(ApiClient.get().getWorkspaceId());
+                }
+                return ApiClient.get().suggestTags(ApiClient.get().getWorkspaceId(), content);
+            }
+            @Override protected void done() {
+                try {
+                    List<String> suggested = get();
+                    for(String s : suggested) {
+                        ApiModels.Tag existing = availableTags.stream()
+                                .filter(t -> t.name.equalsIgnoreCase(s))
+                                .findFirst().orElse(null);
+                        
+                        if (existing != null) {
+                            if (noteTags.stream().noneMatch(t -> t.id.equals(existing.id))) {
+                                addTagToNote(existing);
+                            }
+                        } else {
+                            createAndAddTag(s);
+                        }
+                    }
+                } catch (Exception ignored) {}
+                refreshTagsUI();
             }
         }.execute();
     }

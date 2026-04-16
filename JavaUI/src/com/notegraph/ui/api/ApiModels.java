@@ -109,6 +109,30 @@ public class ApiModels {
         public UserDto user;
     }
 
+    // ── AI Assistant ────────────────────────────────
+    public static class AiChatRequest {
+        public String currentNoteId;
+        public String currentNoteTitle;
+        public String currentNoteContent;
+        public List<String> currentTags;
+        public List<AiChatMessage> history;
+    }
+
+    public static class AiChatMessage {
+        public String role;
+        public String text;
+        public AiChatMessage() {}
+        public AiChatMessage(String role, String text) {
+            this.role = role;
+            this.text = text;
+        }
+    }
+
+    public static class AiChatResponse {
+        public String answer;
+        public String error;
+    }
+
     // ── Helper ──────────────────────────────────────
     /** Simple id-only reference for workspace/owner fields. */
     public static class IdRef {
