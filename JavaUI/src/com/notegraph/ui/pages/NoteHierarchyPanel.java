@@ -111,10 +111,13 @@ public class NoteHierarchyPanel extends JPanel {
         togglePanel.setBorder(BorderFactory.createLineBorder(ColorScheme.BORDER, 1, true));
         orgBtn = createToggleBtn("📊 Chart", true);
         treeBtn = createToggleBtn("📄 Tree", false);
+        JButton graphBtn = createToggleBtn("🧠 Graph", false);
         orgBtn.addActionListener(e -> switchView("org"));
         treeBtn.addActionListener(e -> switchView("tree"));
+        graphBtn.addActionListener(e -> onNavigate.accept("knowledgegraph"));
         togglePanel.add(orgBtn);
         togglePanel.add(treeBtn);
+        togglePanel.add(graphBtn);
         toolbarBtns.add(togglePanel);
 
         JButton filterBtn = new JButton("🔍 Filter by Tag");

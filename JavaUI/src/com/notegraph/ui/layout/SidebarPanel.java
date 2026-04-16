@@ -362,6 +362,8 @@ public class SidebarPanel extends JPanel {
         navContainer.add(Box.createVerticalStrut(4));
         navContainer.add(createNavItem("hierarchy", "📁", "Note Graph"));
         navContainer.add(Box.createVerticalStrut(4));
+        navContainer.add(createNavItem("knowledgegraph", "🧠", "Knowledge Graph"));
+        navContainer.add(Box.createVerticalStrut(4));
         navContainer.add(createNavItem("tags", "🏷", "Tags"));
         navContainer.add(Box.createVerticalStrut(4));
         navContainer.add(createNavItem("favorites", "⭐", "Favorites"));

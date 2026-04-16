@@ -19,6 +19,7 @@ public class MainFrame extends JPanel {
     private DashboardPanel dashboardPanel;
     private EditorPanel editorPanel;
     private NoteHierarchyPanel hierarchyPanel;
+    private KnowledgeGraphPanel knowledgeGraphPanel;
     private TagsPanel tagsPanel;
     private FavoritesPanel favoritesPanel;
     private GuidePanel guidePanel;
@@ -52,6 +53,7 @@ public class MainFrame extends JPanel {
         dashboardPanel = new DashboardPanel(this::navigateTo);
         editorPanel = new EditorPanel(this::navigateTo);
         hierarchyPanel = new NoteHierarchyPanel(this::navigateTo);
+        knowledgeGraphPanel = new KnowledgeGraphPanel(this::navigateTo);
         tagsPanel = new TagsPanel();
         favoritesPanel = new FavoritesPanel(this::navigateTo);
         guidePanel = new GuidePanel();
@@ -59,6 +61,7 @@ public class MainFrame extends JPanel {
         contentArea.add(dashboardPanel, "dashboard");
         contentArea.add(editorPanel, "editor");
         contentArea.add(hierarchyPanel, "hierarchy");
+        contentArea.add(knowledgeGraphPanel, "knowledgegraph");
         contentArea.add(tagsPanel, "tags");
         contentArea.add(favoritesPanel, "favorites");
         contentArea.add(guidePanel, "guide");
@@ -83,6 +86,7 @@ public class MainFrame extends JPanel {
             case "dashboard" -> dashboardPanel.refreshData();
             case "editor" -> editorPanel.loadNote(noteId);
             case "hierarchy" -> hierarchyPanel.refreshData();
+            case "knowledgegraph" -> knowledgeGraphPanel.refreshData();
             case "tags" -> tagsPanel.refreshData();
             case "favorites" -> favoritesPanel.refreshData();
         }

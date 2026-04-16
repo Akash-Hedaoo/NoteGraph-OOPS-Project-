@@ -29,8 +29,13 @@ echo [1/2] Compiling Java sources...
 
 if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
 
-REM Find all .java files and write to temp file
-dir /s /b "%SRC_DIR%\*.java" > "%SCRIPT_DIR%sources.txt"
+REM Find all .java files, quote them and use forward slashes for javac
+type nul > "%SCRIPT_DIR%sources.txt"
+for /f "delims=" %%a in ('dir /s /b "%SRC_DIR%\*.java"') do (
+    set "FPATH=%%a"
+    set "FPATH=!FPATH:\=/!"
+    echo "!FPATH!" >> "%SCRIPT_DIR%sources.txt"
+)
 
 javac -d "%OUT_DIR%" -cp "%CP%" @"%SCRIPT_DIR%sources.txt"
 

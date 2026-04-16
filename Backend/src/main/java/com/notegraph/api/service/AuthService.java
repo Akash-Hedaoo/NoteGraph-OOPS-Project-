@@ -10,7 +10,8 @@ import com.notegraph.api.repository.UserRepository;
 import com.notegraph.api.repository.WorkspaceRepository;
 import com.notegraph.api.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
+// BadCredentialsException removed — it's an AuthenticationException that Spring Security
+// intercepts and converts to 403 before the controller can handle it.
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -58,10 +59,10 @@ public class AuthService {
 
     public AuthResponse login(AuthRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new BadCredentialsException("Invalid email or password");
+            throw new IllegalArgumentException("Invalid email or password");
         }
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
