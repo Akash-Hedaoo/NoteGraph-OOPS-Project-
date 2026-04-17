@@ -4,6 +4,7 @@ import com.notegraph.ui.api.ApiClient;
 import com.notegraph.ui.api.ApiModels;
 import com.notegraph.ui.components.ColorScheme;
 import com.notegraph.ui.components.ConfirmDialog;
+import com.notegraph.ui.components.VectorIcon;
 import com.notegraph.ui.components.RoundedPanel;
 
 import javax.swing.*;
@@ -76,7 +77,7 @@ public class EditorPanel extends JPanel {
         saveStatusLabel.setForeground(ColorScheme.SUCCESS_TEXT);
         actions.add(saveStatusLabel);
 
-        JButton deleteBtn = new JButton("🗑");
+        JButton deleteBtn = new JButton(new VectorIcon(VectorIcon.Type.TRASH, 18, ColorScheme.TEXT_PRIMARY));
         deleteBtn.setToolTipText("Delete Note");
         deleteBtn.setBorderPainted(false);
         deleteBtn.setFocusPainted(false);
@@ -85,9 +86,8 @@ public class EditorPanel extends JPanel {
         deleteBtn.addActionListener(e -> handleDelete());
         actions.add(deleteBtn);
 
-        favBtn = new JButton("☆");
+        favBtn = new JButton(new VectorIcon(VectorIcon.Type.STAR_BORDER, 20, ColorScheme.TEXT_SECONDARY));
         favBtn.setToolTipText("Add to favorites");
-        favBtn.setFont(new Font("SansSerif", Font.PLAIN, 18));
         favBtn.setBorderPainted(false);
         favBtn.setFocusPainted(false);
         favBtn.setBackground(null);
@@ -176,8 +176,8 @@ public class EditorPanel extends JPanel {
         addTagBtn.addActionListener(e -> showAddTagDialog());
         tagsRow.add(addTagBtn);
         
-        JButton suggestTagsBtn = new JButton("✨ Suggest tags");
-        suggestTagsBtn.setFont(new Font(ColorScheme.FONT_REGULAR.getFamily(), Font.PLAIN, 12));
+        JButton suggestTagsBtn = new JButton("Suggest tags", new VectorIcon(VectorIcon.Type.SPARKLE, 14, ColorScheme.PRIMARY_BLUE));
+        suggestTagsBtn.setFont(new Font(ColorScheme.FONT_REGULAR.getFamily(), Font.PLAIN, 13));
         suggestTagsBtn.setForeground(ColorScheme.PRIMARY_BLUE);
         suggestTagsBtn.setBorderPainted(false);
         suggestTagsBtn.setFocusPainted(false);
@@ -243,7 +243,6 @@ public class EditorPanel extends JPanel {
         canvas.add(editorScroll);
 
         editorWrapper.add(canvas, BorderLayout.CENTER);
-        mainLayout.add(editorWrapper, BorderLayout.CENTER);
 
         // ── Right Sidebar ───────────────────────────
         RoundedPanel rightSidebar = new RoundedPanel(0, null, false);
@@ -303,8 +302,8 @@ public class EditorPanel extends JPanel {
         
         // AI Assistant
         rightSidebar.add(Box.createVerticalStrut(20));
-        JLabel aiTitle = new JLabel("✨ AI ASSISTANT");
-        aiTitle.setFont(new Font(ColorScheme.FONT_SEMIBOLD.getFamily(), Font.BOLD, 11));
+        JLabel aiTitle = new JLabel("AI ASSISTANT", new VectorIcon(VectorIcon.Type.SPARKLE, 14, ColorScheme.PRIMARY_BLUE), SwingConstants.LEFT);
+        aiTitle.setFont(new Font(ColorScheme.FONT_SEMIBOLD.getFamily(), Font.BOLD, 12));
         aiTitle.setForeground(ColorScheme.PRIMARY_BLUE);
         aiTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         rightSidebar.add(aiTitle);
@@ -330,7 +329,24 @@ public class EditorPanel extends JPanel {
 
         rightSidebar.add(Box.createVerticalStrut(8));
 
-        mainLayout.add(rightSidebar, BorderLayout.EAST);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, editorWrapper, rightSidebar);
+        splitPane.setDividerLocation(1280 - 320); // Default width approx
+        splitPane.setResizeWeight(1.0); // Give extra space to editor
+        splitPane.setBorder(null);
+        // Clean divider
+        splitPane.setUI(new javax.swing.plaf.basic.BasicSplitPaneUI() {
+            public javax.swing.plaf.basic.BasicSplitPaneDivider createDefaultDivider() {
+                return new javax.swing.plaf.basic.BasicSplitPaneDivider(this) {
+                    public void paint(Graphics g) {
+                        g.setColor(ColorScheme.BORDER);
+                        g.fillRect(0, 0, getSize().width, getSize().height);
+                    }
+                };
+            }
+        });
+        splitPane.setDividerSize(2);
+        
+        mainLayout.add(splitPane, BorderLayout.CENTER);
         add(mainLayout, BorderLayout.CENTER);
 
         // Save timer
@@ -488,8 +504,7 @@ public class EditorPanel extends JPanel {
             }
             @Override protected void done() {
                 isFavorite = !isFavorite;
-                favBtn.setText(isFavorite ? "★" : "☆");
-                favBtn.setForeground(isFavorite ? ColorScheme.STAR_COLOR : ColorScheme.TEXT_SECONDARY);
+                favBtn.setIcon(new VectorIcon(isFavorite ? VectorIcon.Type.STAR_FILLED : VectorIcon.Type.STAR_BORDER, 20, isFavorite ? ColorScheme.STAR_COLOR : ColorScheme.TEXT_SECONDARY));
             }
         }.execute();
     }
@@ -585,8 +600,8 @@ public class EditorPanel extends JPanel {
         addTagBtn.addActionListener(e -> showAddTagDialog());
         tagsRow.add(addTagBtn);
         
-        JButton suggestTagsBtn = new JButton("✨ Suggest tags");
-        suggestTagsBtn.setFont(new Font(ColorScheme.FONT_REGULAR.getFamily(), Font.PLAIN, 12));
+        JButton suggestTagsBtn = new JButton("Suggest tags", new VectorIcon(VectorIcon.Type.SPARKLE, 14, ColorScheme.PRIMARY_BLUE));
+        suggestTagsBtn.setFont(new Font(ColorScheme.FONT_REGULAR.getFamily(), Font.PLAIN, 13));
         suggestTagsBtn.setForeground(ColorScheme.PRIMARY_BLUE);
         suggestTagsBtn.setBorderPainted(false);
         suggestTagsBtn.setFocusPainted(false);
@@ -627,8 +642,7 @@ public class EditorPanel extends JPanel {
                     String plain = content.replaceAll("<[^>]*>", "").replaceAll("&nbsp;", " ").replaceAll("&amp;", "&");
                     editorPane.setText(plain);
                     isFavorite = Boolean.TRUE.equals(currentNote.favorite);
-                    favBtn.setText(isFavorite ? "★" : "☆");
-                    favBtn.setForeground(isFavorite ? ColorScheme.STAR_COLOR : ColorScheme.TEXT_SECONDARY);
+                    favBtn.setIcon(new VectorIcon(isFavorite ? VectorIcon.Type.STAR_FILLED : VectorIcon.Type.STAR_BORDER, 20, isFavorite ? ColorScheme.STAR_COLOR : ColorScheme.TEXT_SECONDARY));
                     noteTags = currentNote.tags != null ? new ArrayList<>(currentNote.tags) : new ArrayList<>();
                     refreshTagsUI();
                     if (currentNote.createdAt != null) {
@@ -647,19 +661,75 @@ public class EditorPanel extends JPanel {
 
     // ── AI Methods ──────────────────────────────────
     private void appendAiMessage(String role, String text) {
-        JLabel msgLabel = new JLabel("<html><p style='width: 200px; padding: 4px;'>" + text.replace("\n", "<br>") + "</p></html>");
-        msgLabel.setFont(new Font(ColorScheme.FONT_REGULAR.getFamily(), Font.PLAIN, 12));
-        if ("user".equals(role)) {
-            msgLabel.setForeground(ColorScheme.TEXT_PRIMARY);
-            msgLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        boolean isUser = "user".equals(role);
+        
+        JPanel row = new JPanel() {
+            @Override
+            public Dimension getMaximumSize() {
+                return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+            }
+        };
+        row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+        row.setOpaque(false);
+        row.setBorder(new EmptyBorder(4, 4, 12, 4));
+
+        // Avatar
+        JLabel avatar = new JLabel(new VectorIcon(isUser ? VectorIcon.Type.AVATAR_USER : VectorIcon.Type.AVATAR_AI, 24, isUser ? ColorScheme.TEXT_SECONDARY : ColorScheme.PRIMARY_BLUE));
+        avatar.setVerticalAlignment(SwingConstants.TOP);
+        avatar.setBorder(new EmptyBorder(2, 4, 0, 4));
+
+        // Chat Bubble
+        RoundedPanel bubble = new RoundedPanel(16, null, false);
+        bubble.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        bubble.setBackground(isUser ? ColorScheme.PRIMARY_BLUE : ColorScheme.BG_APP);
+        bubble.setBorder(new EmptyBorder(10, 14, 10, 14));
+
+        JTextArea textArea = new JTextArea(text.replaceAll("\\*\\*", "")) {
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension d = super.getPreferredSize();
+                int maxW = 200;
+                if (d.width > maxW) {
+                    setSize(new Dimension(maxW, Short.MAX_VALUE));
+                    return new Dimension(maxW, super.getPreferredSize().height);
+                }
+                return d;
+            }
+        };
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setFont(new Font(ColorScheme.FONT_REGULAR.getFamily(), Font.PLAIN, 13));
+        textArea.setForeground(isUser ? Color.WHITE : ColorScheme.TEXT_PRIMARY);
+        textArea.setBackground(isUser ? ColorScheme.PRIMARY_BLUE : ColorScheme.BG_APP);
+        textArea.setEditable(false);
+        textArea.setOpaque(true);
+        textArea.setBorder(null);
+
+        bubble.add(textArea);
+
+        if (isUser) {
+            row.add(Box.createHorizontalGlue());
+            row.add(bubble);
+            row.add(avatar);
         } else {
-            msgLabel.setForeground(ColorScheme.PRIMARY_BLUE);
-            msgLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            row.add(avatar);
+            row.add(bubble);
+            row.add(Box.createHorizontalGlue());
         }
-        aiChatPanel.add(msgLabel);
-        aiChatPanel.add(Box.createVerticalStrut(8));
+
+        aiChatPanel.add(row);
         aiChatPanel.revalidate();
         aiChatPanel.repaint();
+        
+        // Auto scroll to bottom
+        SwingUtilities.invokeLater(() -> {
+            Container parent = SwingUtilities.getAncestorOfClass(JScrollPane.class, aiChatPanel);
+            if (parent != null) {
+                JScrollPane scroll = (JScrollPane) parent;
+                JScrollBar vertical = scroll.getVerticalScrollBar();
+                vertical.setValue(vertical.getMaximum());
+            }
+        });
     }
 
     private void handleAiChatSubmit() {

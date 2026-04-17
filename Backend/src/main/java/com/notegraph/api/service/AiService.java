@@ -151,32 +151,52 @@ public class AiService {
 
         String jsonBody = gson.toJson(requestBody);
         
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + geminiApiKey))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-                .build();
+        // Dynamic Runtime Fallback List of Gemini Models
+        String[] fallbackModels = {
+            "gemini-1.5-flash",
+            "gemini-2.5-flash",
+            "gemini-1.5-pro",
+            "gemini-1.0-pro"
+        };
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        for (int i = 0; i < fallbackModels.length; i++) {
+            String model = fallbackModels[i];
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + geminiApiKey))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .build();
 
-        if (response.statusCode() >= 400) {
-            throw new RuntimeException("Gemini API error (" + response.statusCode() + "): " + response.body());
-        }
+            try {
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                
+                // 503 (Unavailable) or 429 (Too Many Requests) -> Instantly fallback to the next model in the ring
+                if ((response.statusCode() == 503 || response.statusCode() == 429) && i < fallbackModels.length - 1) {
+                    continue;
+                }
+                
+                if (response.statusCode() >= 400) {
+                    // Do not fail entirely if one model breaks due to a bad schema or formatting constraint, try the next!
+                    if (i < fallbackModels.length - 1) continue;
+                    throw new RuntimeException("Gemini API error (" + response.statusCode() + "): " + response.body());
+                }
 
-        try {
-            JsonObject responseNode = JsonParser.parseString(response.body()).getAsJsonObject();
-            JsonArray candidates = responseNode.getAsJsonArray("candidates");
-            if (candidates != null && candidates.size() > 0) {
-                JsonArray parts = candidates.get(0).getAsJsonObject()
-                        .getAsJsonObject("content").getAsJsonArray("parts");
-                if (parts != null && parts.size() > 0) {
-                    return parts.get(0).getAsJsonObject().get("text").getAsString();
+                JsonObject responseNode = JsonParser.parseString(response.body()).getAsJsonObject();
+                JsonArray candidates = responseNode.getAsJsonArray("candidates");
+                if (candidates != null && candidates.size() > 0) {
+                    JsonArray parts = candidates.get(0).getAsJsonObject()
+                            .getAsJsonObject("content").getAsJsonArray("parts");
+                    if (parts != null && parts.size() > 0) {
+                        return parts.get(0).getAsJsonObject().get("text").getAsString();
+                    }
+                }
+            } catch (Exception e) {
+                if (i == fallbackModels.length - 1) {
+                    return "Sorry, all our AI models are currently experiencing high burst limits. Please try again in 10 seconds.";
                 }
             }
-        } catch (Exception e) {
-             throw new RuntimeException("Failed to parse Gemini response: " + e.getMessage());
         }
-        return "";
+        return "Sorry, the AI model array is currently unreachable.";
     }
 
     // DTOs

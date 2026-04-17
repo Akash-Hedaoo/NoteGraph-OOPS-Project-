@@ -64,6 +64,7 @@ public class NoteGraphApp {
         }
 
         // Global UI tweaks
+        UIManager.put("defaultFont", ColorScheme.FONT_REGULAR);
         UIManager.put("Button.arc", 8);
         UIManager.put("Component.arc", 8);
         UIManager.put("TextComponent.arc", 6);

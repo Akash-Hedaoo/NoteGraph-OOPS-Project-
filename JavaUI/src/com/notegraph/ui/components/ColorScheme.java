@@ -74,10 +74,10 @@ public final class ColorScheme {
                 }
             }
         }
-        FONT_REGULAR  = new Font(family, Font.PLAIN, 14);
-        FONT_MEDIUM   = new Font(family, Font.PLAIN, 14);
-        FONT_SEMIBOLD = new Font(family, Font.BOLD, 14);
-        FONT_BOLD     = new Font(family, Font.BOLD, 16);
+        FONT_REGULAR  = new Font(family, Font.PLAIN, 15);
+        FONT_MEDIUM   = new Font(family, Font.PLAIN, 15);
+        FONT_SEMIBOLD = new Font(family, Font.BOLD, 15);
+        FONT_BOLD     = new Font(family, Font.BOLD, 18);
     }
 
     /** Get a tag's background color by name. */
