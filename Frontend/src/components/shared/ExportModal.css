@@ -1,0 +1,171 @@
+.export-modal {
+  width: 500px;
+  max-height: 85vh;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modal-header-simple {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.modal-body {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.export-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.export-option {
+  display: flex;
+  padding: 1rem 1.25rem;
+  gap: 1rem;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s;
+  align-items: flex-start;
+}
+
+.export-option.selected {
+  border-color: var(--primary-blue);
+  background-color: rgba(10, 102, 240, 0.02);
+}
+
+.radio-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.export-option.selected .radio-circle {
+  border-color: var(--primary-blue);
+}
+
+.radio-inner {
+  width: 10px;
+  height: 10px;
+  background-color: var(--primary-blue);
+  border-radius: 50%;
+}
+
+.export-option-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.e-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.e-desc {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.modal-footer-actions {
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  background-color: var(--bg-app);
+  border-top: 1px solid var(--border-color);
+  border-radius: 0 0 12px 12px;
+  flex-shrink: 0;
+}
+
+/* Toast Notification matching right bottom corner */
+.toast-notification {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 2000;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  animation: slideInUp 0.3s ease-out forwards;
+}
+
+.notification-dark {
+  background-color: #111827;
+  color: white;
+}
+
+.toast-icon-wrapper {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg-green { background-color: var(--success-text); }
+
+.toast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.toast-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.toast-desc {
+  font-size: 0.85rem;
+  color: #9CA3AF;
+}
+
+.toast-close {
+  color: #9CA3AF;
+  margin-left: 2rem;
+}
+
+.toast-close:hover {
+  color: white;
+}
+
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

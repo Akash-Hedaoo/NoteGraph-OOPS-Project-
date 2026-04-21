@@ -1,0 +1,27 @@
+# IDE Specific Files
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Java Build Files
+target/
+*.class
+
+# Frontend Build and Dependencies
+node_modules/
+dist/
+.env
+.env.local
+
+# Maven Wrapper (optional, usually kept)
+#!mvnw
+#!mvnw.cmd
+#!.mvn/
+
+# Log Files
+*.log
+logs/
+
+# Secrets (Optional, if you want to keep application.yml private)
+#Backend/src/main/resources/application.yml

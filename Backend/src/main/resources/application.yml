@@ -1,0 +1,29 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: notegraph
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update # Auto-create/update tables based on entities
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  expiration: 86400000 # 24 hours in milliseconds
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:YOUR_API_KEY_HERE}
