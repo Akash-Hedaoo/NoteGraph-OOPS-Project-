@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   FileText, Star, Tag, Trash2, FolderClosed, BookOpen,
-  Settings, User, Plus, LayoutDashboard, ChevronDown, Check, Edit2
+  Settings, User, Plus, LayoutDashboard, ChevronDown, Check, Edit2,
+  Brain, LogOut
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -11,7 +12,7 @@ import './Sidebar.css';
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const { user, workspaces, workspaceId, setWorkspaceId, fetchWorkspaces } = useAuth();
+  const { user, workspaces, workspaceId, setWorkspaceId, fetchWorkspaces, logout } = useAuth();
   
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -228,6 +229,9 @@ const Sidebar = () => {
             <NavLink to="/hierarchy" className="nav-item">
               <FolderClosed size={18} /> Note Graph
             </NavLink>
+            <NavLink to="/knowledge-graph" className="nav-item">
+              <Brain size={18} /> Knowledge Graph
+            </NavLink>
             <NavLink to="/tags" className="nav-item">
               <Tag size={18} /> Tags
             </NavLink>
@@ -264,6 +268,12 @@ const Sidebar = () => {
         <div className="settings-btn">
           <Settings size={18} /> Settings
         </div>
+        <button 
+          className="logout-btn" 
+          onClick={() => { logout(); navigate('/login'); }}
+        >
+          <LogOut size={16} /> Logout
+        </button>
       </div>
 
       {/* Custom Create Workspace Modal */}

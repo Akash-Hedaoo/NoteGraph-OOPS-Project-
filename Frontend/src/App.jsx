@@ -1,9 +1,11 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
+import LandingPage from './pages/LandingPage';
 import DashboardLayout from './components/layout/DashboardLayout';
 import DashboardOverview from './pages/DashboardOverview';
 import NoteHierarchy from './pages/NoteHierarchy';
+import KnowledgeGraph from './pages/KnowledgeGraph';
 import Editor from './pages/Editor';
 import TagsPage from './pages/TagsPage';
 import FavoritesPage from './pages/FavoritesPage';
@@ -14,7 +16,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         
         {/* Authenticated Routes Wrapped in Layout */}
@@ -25,6 +28,7 @@ function App() {
         }>
           <Route path="/dashboard" element={<DashboardOverview />} />
           <Route path="/hierarchy" element={<NoteHierarchy />} />
+          <Route path="/knowledge-graph" element={<KnowledgeGraph />} />
           <Route path="/editor" element={<Editor />} />
           <Route path="/editor/:id" element={<Editor />} />
           <Route path="/tags" element={<TagsPage />} />

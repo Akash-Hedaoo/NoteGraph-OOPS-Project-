@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Check, ChevronDown, Share, FileText, Calendar, Clock, Folder, Tag,
   X, Bold, Italic, Underline, Heading1, Heading2, List, 
-  ListOrdered, CheckSquare, Link, Image as ImageIcon, Sparkles, Plus, Star, Trash2 
+  ListOrdered, CheckSquare, Link, Image as ImageIcon, Sparkles, Plus, Star, Trash2,
+  Send, Wand2, Bot, User as UserIcon
 } from 'lucide-react';
 import ExportModal from '../components/shared/ExportModal';
 import api from '../services/api';
@@ -29,6 +30,15 @@ const Editor = () => {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
   const [confirmAction, setConfirmAction] = useState(null);
+
+  // AI features state
+  const [aiMessages, setAiMessages] = useState([]);
+  const [aiInput, setAiInput] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [suggestedTags, setSuggestedTags] = useState([]);
+  const [isSuggestingTags, setIsSuggestingTags] = useState(false);
+  const [isAiFormatting, setIsAiFormatting] = useState(false);
+
   const [isWsDropdownOpen, setIsWsDropdownOpen] = useState(false);
   const [isSectionDropdownOpen, setIsSectionDropdownOpen] = useState(false);
   const wsDropdownRef = useRef(null);
@@ -41,6 +51,7 @@ const Editor = () => {
   
   const editorRef = useRef(null);
   const titleRef = useRef(null);
+  const aiChatEndRef = useRef(null);
   const saveTimeoutRef = useRef(null);
   const noteIdRef = useRef(id);
 
@@ -218,6 +229,80 @@ const Editor = () => {
       editorRef.current.focus();
     }
     handleInput();
+  };
+
+  // ── AI Features ──────────────────────────────────
+  const handleAiChat = async () => {
+    if (!aiInput.trim() || aiLoading || !workspaceId) return;
+    const userMsg = aiInput.trim();
+    setAiInput('');
+    setAiMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+    setAiLoading(true);
+
+    try {
+      const res = await api.post(`/ai/chat/${workspaceId}`, {
+        message: userMsg,
+        history: aiMessages.map(m => ({ role: m.role, content: m.text })),
+        currentNoteContent: editorRef.current?.innerText || '',
+      });
+      setAiMessages(prev => [...prev, { role: 'ai', text: res.data.answer }]);
+    } catch (e) {
+      setAiMessages(prev => [...prev, { role: 'ai', text: 'Sorry, I couldn\'t process that. Please try again.' }]);
+      console.error('AI chat error', e);
+    } finally {
+      setAiLoading(false);
+      setTimeout(() => aiChatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+    }
+  };
+
+  const handleAiSuggestTags = async () => {
+    if (!workspaceId || isSuggestingTags) return;
+    setIsSuggestingTags(true);
+    setSuggestedTags([]);
+    try {
+      const content = editorRef.current?.innerText || titleRef.current?.innerText || '';
+      const res = await api.post(`/ai/tags/suggest/${workspaceId}`, { content });
+      setSuggestedTags(res.data || []);
+    } catch (e) {
+      console.error('AI tag suggestion error', e);
+    } finally {
+      setIsSuggestingTags(false);
+    }
+  };
+
+  const handleApplySuggestedTag = async (tagName) => {
+    if (!noteIdRef.current) return;
+    let tagToUse = availableTags.find(t => t.name.toLowerCase() === tagName.toLowerCase());
+    if (!tagToUse) {
+      try {
+        const res = await api.post('/tags', {
+          name: tagName, color: ['blue', 'purple', 'green', 'orange', 'red'][Math.floor(Math.random() * 5)],
+          workspace: { id: workspaceId }
+        });
+        tagToUse = res.data;
+        setAvailableTags(prev => [...prev, tagToUse]);
+      } catch { return; }
+    }
+    if (tags.some(t => t.id === tagToUse.id)) return;
+    try {
+      await api.post(`/notes/${noteIdRef.current}/tags/${tagToUse.id}`);
+      setTags(prev => [...prev, tagToUse]);
+      setSuggestedTags(prev => prev.filter(n => n.toLowerCase() !== tagName.toLowerCase()));
+    } catch (e) { console.error('Failed to apply suggested tag', e); }
+  };
+
+  const handleAiFormat = async () => {
+    if (!editorRef.current || isAiFormatting) return;
+    setIsAiFormatting(true);
+    try {
+      const content = editorRef.current.innerHTML;
+      const res = await api.post('/ai/format', { content });
+      if (res.data.formatted) {
+        editorRef.current.innerHTML = res.data.formatted;
+        handleInput();
+      }
+    } catch (e) { console.error('AI format error', e); }
+    finally { setIsAiFormatting(false); }
   };
 
   const handleLink = () => {
@@ -516,7 +601,26 @@ const Editor = () => {
                 </span>
               ))}
               <button className="add-tag-text-btn" onClick={handleAddTagClick}>+ Add tag</button>
+              <button 
+                className="ai-suggest-tags-btn" 
+                onClick={handleAiSuggestTags} 
+                disabled={isSuggestingTags || !noteIdRef.current}
+                title="AI Suggest Tags"
+              >
+                <Sparkles size={12} /> {isSuggestingTags ? 'Thinking...' : 'AI Suggest'}
+              </button>
             </div>
+
+            {suggestedTags.length > 0 && (
+              <div className="ai-suggested-tags">
+                <span style={{ fontSize: '11px', color: 'var(--text-tertiary)', fontWeight: '600' }}>✨ AI Suggestions:</span>
+                {suggestedTags.map((tag, i) => (
+                  <button key={i} className="ai-suggested-tag" onClick={() => handleApplySuggestedTag(tag)}>
+                    <Plus size={10} /> {tag}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Rich Text Toolbar */}
             <div className="rich-text-toolbar">
@@ -539,6 +643,15 @@ const Editor = () => {
               <div className="toolbar-group push-right">
                 <button className="toolbar-btn" onClick={handleLink} title="Insert Link"><Link size={16} /></button>
                 <button className="toolbar-btn" onClick={handleImage} title="Insert Image"><ImageIcon size={16} /></button>
+                <div className="toolbar-divider" />
+                <button 
+                  className="toolbar-btn ai-btn" 
+                  onClick={handleAiFormat} 
+                  disabled={isAiFormatting}
+                  title="AI Format Content"
+                >
+                  <Wand2 size={14} /> {isAiFormatting ? 'Formatting...' : 'AI Format'}
+                </button>
               </div>
             </div>
 
@@ -603,9 +716,65 @@ const Editor = () => {
                 </div>
               </div>
              )}
-             <button className="link-note-btn text-blue bg-transparent" style={{marginTop: '12px'}} onClick={handleAddTagClick}>
-               <Plus size={14} /> Link a note
-             </button>
+              <button className="link-note-btn text-blue bg-transparent" style={{marginTop: '12px'}} onClick={handleAddTagClick}>
+                <Plus size={14} /> Link a note
+              </button>
+           </div>
+
+           {/* AI Chat Section */}
+           <div className="ai-chat-section">
+             <div className="ai-chat-header">
+               <span className="ai-chat-title"><Bot size={14} /> AI ASSISTANT</span>
+             </div>
+
+             <div className="ai-chat-messages">
+               {aiMessages.length === 0 && (
+                 <div style={{ padding: '16px 0', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '13px' }}>
+                   <Bot size={24} style={{ opacity: 0.3, marginBottom: 6 }} />
+                   <br />Ask AI about this note, get summaries, or explore ideas.
+                 </div>
+               )}
+               {aiMessages.map((msg, i) => (
+                 <div key={i} className="ai-message">
+                   <div className={`ai-message-avatar ${msg.role === 'ai' ? 'ai' : 'user'}`}>
+                     {msg.role === 'ai' ? <Bot size={14} /> : <UserIcon size={14} />}
+                   </div>
+                   <div className={`ai-message-bubble ${msg.role === 'ai' ? 'ai' : 'user'}`}>
+                     {msg.text}
+                   </div>
+                 </div>
+               ))}
+               {aiLoading && (
+                 <div className="ai-message">
+                   <div className="ai-message-avatar ai"><Bot size={14} /></div>
+                   <div className="ai-typing-indicator">
+                     <div className="ai-typing-dot" />
+                     <div className="ai-typing-dot" />
+                     <div className="ai-typing-dot" />
+                   </div>
+                 </div>
+               )}
+               <div ref={aiChatEndRef} />
+             </div>
+
+             <div className="ai-chat-input-row">
+               <input
+                 className="ai-chat-input"
+                 type="text"
+                 placeholder="Ask about this note..."
+                 value={aiInput}
+                 onChange={(e) => setAiInput(e.target.value)}
+                 onKeyDown={(e) => e.key === 'Enter' && handleAiChat()}
+                 disabled={aiLoading}
+               />
+               <button
+                 className="ai-chat-send-btn"
+                 onClick={handleAiChat}
+                 disabled={!aiInput.trim() || aiLoading}
+               >
+                 <Send size={14} />
+               </button>
+             </div>
            </div>
         </aside>
       </div>
