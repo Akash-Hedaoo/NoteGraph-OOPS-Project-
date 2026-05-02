@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   ChevronRight, Filter, ArrowUpDown, FileText, Share2, Download,
-  Settings, Maximize, X, Activity, User, Tag, ChevronDown, Plus, Trash2, Edit2
+  Settings, Maximize, Minimize, X, Activity, User, Tag, ChevronDown, Plus, Trash2, Edit2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -46,6 +46,15 @@ const NoteHierarchy = () => {
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('tree'); // 'org' or 'tree'
   const [expandedTags, setExpandedTags] = useState({});
+
+  // Feature states
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterTagId, setFilterTagId] = useState(null);
+
+  const filteredGraphData = filterTagId 
+    ? graphData.filter(tag => tag.tagId === filterTagId)
+    : graphData;
 
   // Rename modal state
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
@@ -197,7 +206,7 @@ const NoteHierarchy = () => {
 
   return (
     <div className="note-hierarchy-page">
-      <div className="hierarchy-main-area">
+      <div className={`hierarchy-main-area ${isFullscreen ? 'fullscreen-mode' : ''}`}>
         {/* Header Breadcrumbs */}
         <header className="page-header-row">
           <div className="breadcrumbs">
@@ -217,8 +226,36 @@ const NoteHierarchy = () => {
                    <FileText size={18} />
                  </button>
                </div>
-               <button className="btn-outline"><Filter size={16} /> Filter by Tag</button>
-               <button className="icon-btn-small border-btn"><Maximize size={16} /></button>
+               <button className="btn-outline" onClick={handleExportWorkspace} title="Export entire workspace">
+                 <Download size={16} /> Export
+               </button>
+               <div style={{position: 'relative'}}>
+                 <button className="btn-outline" onClick={() => setIsFilterOpen(!isFilterOpen)}>
+                   <Filter size={16} /> {filterTagId ? `#${graphData.find(t => t.tagId === filterTagId)?.tagTitle}` : 'Filter by Tag'}
+                 </button>
+                 {isFilterOpen && (
+                   <div className="card" style={{position: 'absolute', top: '100%', right: 0, marginTop: '8px', padding: '8px', zIndex: 100, background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '8px', minWidth: '160px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)'}}>
+                     <div 
+                       style={{padding: '8px 12px', cursor: 'pointer', borderRadius: '4px', fontSize: '13px', background: filterTagId === null ? 'var(--bg-app)' : 'transparent', color: filterTagId === null ? 'var(--primary-blue)' : 'var(--text-primary)'}}
+                       onClick={() => { setFilterTagId(null); setIsFilterOpen(false); }}
+                     >
+                       All Tags
+                     </div>
+                     {graphData.map(tag => (
+                       <div 
+                         key={tag.tagId}
+                         style={{padding: '8px 12px', cursor: 'pointer', borderRadius: '4px', fontSize: '13px', background: filterTagId === tag.tagId ? 'var(--bg-app)' : 'transparent', color: filterTagId === tag.tagId ? 'var(--primary-blue)' : 'var(--text-primary)'}}
+                         onClick={() => { setFilterTagId(tag.tagId); setIsFilterOpen(false); }}
+                       >
+                         #{tag.tagTitle}
+                       </div>
+                     ))}
+                   </div>
+                 )}
+               </div>
+               <button className="icon-btn-small border-btn" onClick={() => setIsFullscreen(!isFullscreen)}>
+                 {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+               </button>
             </div>
           </div>
         </header>
@@ -234,20 +271,20 @@ const NoteHierarchy = () => {
               </div>
 
               {/* Connecting Line Down from Root */}
-              {graphData.length > 0 && <div className="org-line-down"></div>}
+              {filteredGraphData.length > 0 && <div className="org-line-down"></div>}
 
               {/* Horizontal Connecting Line for Branches */}
-              {graphData.length > 1 && <div className="org-line-horizontal" style={{ width: `${Math.min(graphData.length * 200, 800)}px` }}></div>}
+              {filteredGraphData.length > 1 && <div className="org-line-horizontal" style={{ width: `${Math.min(filteredGraphData.length * 200, 800)}px` }}></div>}
 
               {/* Tag Categories Level */}
               <div className="org-level branches">
                 
                 {loading ? (
                   <div style={{ padding: '20px', color: 'var(--text-secondary)' }}>Loading graph...</div>
-                ) : graphData.length === 0 ? (
-                  <div style={{ padding: '20px', color: 'var(--text-secondary)' }}>No tags created yet. Create some notes and add tags to see the connections!</div>
+                ) : filteredGraphData.length === 0 ? (
+                  <div style={{ padding: '20px', color: 'var(--text-secondary)' }}>No tags found.</div>
                 ) : (
-                  graphData.map((tagNode, index) => {
+                  filteredGraphData.map((tagNode, index) => {
                     const color = tagNode.tagColor || COLORS[index % COLORS.length];
                     return (
                       <div key={tagNode.tagId} className="org-branch">
@@ -297,23 +334,16 @@ const NoteHierarchy = () => {
                     >
                       <Edit2 size={14} />
                     </button>
-                    <button 
-                      className="icon-btn-small" 
-                      onClick={handleExportWorkspace}
-                      title="Export Workspace"
-                    >
-                      <Download size={14} />
-                    </button>
                   </div>
                </div>
 
-               {loading ? (
+                {loading ? (
                   <div style={{ padding: '20px', color: 'var(--text-secondary)' }}>Loading graph...</div>
-                ) : graphData.length === 0 ? (
-                  <div style={{ padding: '20px', color: 'var(--text-secondary)' }}>No tags created yet.</div>
+                ) : filteredGraphData.length === 0 ? (
+                  <div style={{ padding: '20px', color: 'var(--text-secondary)' }}>No tags found.</div>
                 ) : (
                   <div className="tree-branches" style={{display: 'flex', flexDirection: 'column', gap: '16px', borderLeft: '1px solid var(--border-color)', marginLeft: '24px', paddingLeft: '24px'}}>
-                    {graphData.map((tagNode, index) => {
+                    {filteredGraphData.map((tagNode, index) => {
                       const color = tagNode.tagColor || COLORS[index % COLORS.length];
                       const isExpanded = expandedTags[tagNode.tagId];
                       return (
@@ -353,7 +383,7 @@ const NoteHierarchy = () => {
                            {isExpanded && tagNode.leaves && (
                              <div className="tree-leaves" style={{display: 'flex', flexDirection: 'column', gap: '8px', borderLeft: '1px solid var(--border-color)', marginLeft: '24px', paddingLeft: '24px', marginTop: '12px', paddingBottom: '12px'}}>
                                {tagNode.leaves.map((note) => (
-                                 <div key={note.id} className="tree-leaf card" style={{padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid var(--border-color)', borderRadius: '8px', background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.02)'}} onClick={() => navigate(`/editor/${note.id}`)}>
+                                 <div key={note.id} className="tree-leaf card" style={{padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-surface)', boxShadow: '0 1px 3px rgba(0,0,0,0.02)'}} onClick={() => navigate(`/editor/${note.id}`)}>
                                     <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
                                       <FileText size={16} className={`text-${color}`} />
                                       <span style={{fontSize: '14px', fontWeight: '500'}}>{note.title || 'Untitled Note'}</span>
@@ -366,7 +396,7 @@ const NoteHierarchy = () => {
                                     </div>
                                  </div>
                                ))}
-                               <div className="add-leaf-dropzone" style={{border: '1px dashed var(--blue)', background: 'var(--blue-light)', color: 'var(--blue)', padding: '12px', textAlign: 'center', borderRadius: '8px', fontSize: '13px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', cursor: 'pointer', marginTop: '4px'}}>
+                               <div className="add-leaf-dropzone" style={{border: '1px dashed var(--primary-blue)', background: 'var(--tag-blue-bg)', color: 'var(--primary-blue)', padding: '12px', textAlign: 'center', borderRadius: '8px', fontSize: '13px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', cursor: 'pointer', marginTop: '4px'}}>
                                   <Plus size={14} /> Drop here to move
                                </div>
                              </div>
@@ -392,11 +422,11 @@ const NoteHierarchy = () => {
             <button className="icon-btn-small" onClick={() => setSelectedTag(null)}><X size={18} /></button>
           </div>
 
-          <div className={`preview-card bg-purple-tint`}>
-            <div className={`tag-badge-large bg-${selectedTag.color || 'purple'}`}>
-              <Tag size={20} color="white" />
+          <div className={`preview-card bg-blue-tint`}>
+            <div className={`tag-badge-large bg-${selectedTag.color || 'blue'}`}>
+              <Tag size={20} color="var(--bg-surface)" />
             </div>
-            <h4 className={`mt-4 text-${selectedTag.color || 'purple'}-dark`}>#{selectedTag.tagName}</h4>
+            <h4 className={`mt-4 text-${selectedTag.color || 'blue'}-dark`}>#{selectedTag.tagName || selectedTag.tagTitle}</h4>
             <span className="preview-path">{selectedTag.noteCount} Notes Connected</span>
             <svg className="watermark-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           </div>
@@ -430,7 +460,7 @@ const NoteHierarchy = () => {
             <div className="connected-notes-list">
               {selectedTag.leaves && selectedTag.leaves.map(note => (
                 <div key={note.id} className="mini-note-result card">
-                  <div className={`icon-box bg-${selectedTag.color || 'purple'}-light text-${selectedTag.color || 'purple'}`}>
+                  <div className={`icon-box bg-${selectedTag.color || 'blue'}-light text-${selectedTag.color || 'blue'}`}>
                     <FileText size={16} />
                   </div>
                   <div className="c-info">

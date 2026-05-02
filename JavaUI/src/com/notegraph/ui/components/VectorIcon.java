@@ -9,7 +9,7 @@ public class VectorIcon implements Icon {
     public enum Type { 
         TRASH, STAR_BORDER, STAR_FILLED, SPARKLE, AVATAR_USER, AVATAR_AI,
         FORMAT_BOLD, FORMAT_ITALIC, FORMAT_UNDERLINE, HEADING_1, HEADING_2, LIST_BULLET, LIST_NUMBER,
-        NAV_DASHBOARD, NAV_NOTE_GRAPH, NAV_KNOWLEDGE_GRAPH, NAV_TAGS, NAV_FAVORITES, NAV_GUIDE
+        NAV_DASHBOARD, NAV_NOTE_GRAPH, NAV_KNOWLEDGE_GRAPH, NAV_TAGS, NAV_FAVORITES, NAV_GUIDE, NAV_REVISION
     }
 
     private Type type;
@@ -181,6 +181,22 @@ public class VectorIcon implements Icon {
                 g2.setStroke(new BasicStroke(Math.max(1.5f, s/15f), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                 g2.drawRect((int)(s*0.1), (int)(s*0.2), (int)(s*0.4), (int)(s*0.6));
                 g2.drawRect((int)(s*0.5), (int)(s*0.2), (int)(s*0.4), (int)(s*0.6));
+                break;
+            case NAV_REVISION:
+                // Checklist with clock icon
+                g2.setStroke(new BasicStroke(Math.max(1.5f, s/15f), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                // Clipboard outline
+                g2.drawRoundRect((int)(s*0.15), (int)(s*0.2), (int)(s*0.7), (int)(s*0.7), 3, 3);
+                // Clipboard top tab
+                g2.fillRoundRect((int)(s*0.35), (int)(s*0.1), (int)(s*0.3), (int)(s*0.15), 2, 2);
+                // Checkmark lines
+                g2.drawLine((int)(s*0.25), (int)(s*0.45), (int)(s*0.35), (int)(s*0.55));
+                g2.drawLine((int)(s*0.35), (int)(s*0.55), (int)(s*0.5), (int)(s*0.4));
+                // List line
+                g2.drawLine((int)(s*0.55), (int)(s*0.48), (int)(s*0.75), (int)(s*0.48));
+                // Second row dot + line
+                g2.fillOval((int)(s*0.25), (int)(s*0.65), (int)(s*0.08), (int)(s*0.08));
+                g2.drawLine((int)(s*0.38), (int)(s*0.69), (int)(s*0.75), (int)(s*0.69));
                 break;
         }
         g2.dispose();

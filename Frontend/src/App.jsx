@@ -10,6 +10,7 @@ import Editor from './pages/Editor';
 import TagsPage from './pages/TagsPage';
 import FavoritesPage from './pages/FavoritesPage';
 import GuidePage from './pages/GuidePage';
+import RevisionPage from './pages/RevisionPage';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
           <Route path="/editor/:id" element={<Editor />} />
           <Route path="/tags" element={<TagsPage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
+          <Route path="/revisions" element={<RevisionPage />} />
           <Route path="/guide" element={<GuidePage />} />
           
           {/* Map mockup Sidebar Links to the existing views so they "work" */}

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   FileText, Star, Tag, Trash2, FolderClosed, BookOpen,
   Settings, User, Plus, LayoutDashboard, ChevronDown, Check, Edit2,
-  Brain, LogOut
+  Brain, LogOut, ClipboardCheck
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -238,6 +238,9 @@ const Sidebar = () => {
             <NavLink to="/favorites" className="nav-item">
               <Star size={18} /> Favorites
             </NavLink>
+            <NavLink to="/revisions" className="nav-item">
+              <ClipboardCheck size={18} /> Revisions
+            </NavLink>
             <NavLink to="/guide" className="nav-item">
               <BookOpen size={18} /> Guide
             </NavLink>
@@ -264,17 +267,7 @@ const Sidebar = () => {
         </div>
       </div>
 
-      <div className="sidebar-footer">
-        <div className="settings-btn">
-          <Settings size={18} /> Settings
-        </div>
-        <button 
-          className="logout-btn" 
-          onClick={() => { logout(); navigate('/login'); }}
-        >
-          <LogOut size={16} /> Logout
-        </button>
-      </div>
+
 
       {/* Custom Create Workspace Modal */}
       {isCreateModalOpen && (

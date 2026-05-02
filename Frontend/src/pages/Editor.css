@@ -235,7 +235,7 @@
 .task-checkbox.checked {
   background-color: var(--primary-blue);
   border-color: var(--primary-blue);
-  color: white;
+  color: var(--bg-surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -262,7 +262,7 @@
 
 /* RIGHT SIDEBAR */
 .editor-context-sidebar {
-  background-color: white;
+  background-color: var(--bg-surface);
   border-left: 1px solid var(--border-color);
   overflow-y: auto;
   padding: 2rem 1.5rem;
@@ -450,12 +450,12 @@
 
 .ai-message-avatar.ai {
   background: linear-gradient(135deg, #8B5CF6, #6366F1);
-  color: #fff;
+  color: var(--bg-surface);
 }
 
 .ai-message-avatar.user {
   background: linear-gradient(135deg, #3B82F6, #2563EB);
-  color: #fff;
+  color: var(--bg-surface);
 }
 
 .ai-message-bubble {

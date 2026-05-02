@@ -10,8 +10,9 @@ import './KnowledgeGraph.css';
    ═══════════════════════════════════════════════════════════ */
 
 const TAG_COLORS = [
-  '#6366F1', '#10B981', '#F59E0B', '#EF4444',
-  '#8B5CF6', '#3B82F6', '#EC4899', '#14B8A6',
+  '#4F46E5', '#059669', '#D97706', '#DC2626',
+  '#7C3AED', '#2563EB', '#DB2777', '#0D9488',
+  '#E11D48', '#0EA5E9', '#16A34A', '#EA580C',
 ];
 
 const REPULSION = 8000;
@@ -166,11 +167,12 @@ const KnowledgeGraph = () => {
     const { offsetX, offsetY, zoom } = cameraRef.current;
 
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = '#f8fafc';
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    ctx.fillStyle = isDark ? '#0F172A' : '#f8fafc';
     ctx.fillRect(0, 0, w, h);
 
     // Dot grid
-    ctx.fillStyle = 'rgba(10, 102, 240, 0.06)';
+    ctx.fillStyle = isDark ? 'rgba(59, 130, 246, 0.08)' : 'rgba(10, 102, 240, 0.06)';
     for (let x = 0; x < w; x += 24) {
       for (let y = 0; y < h; y += 24) {
         ctx.beginPath();
@@ -252,7 +254,7 @@ const KnowledgeGraph = () => {
       } else {
         ctx.beginPath();
         ctx.arc(sx, sy, r, 0, Math.PI * 2);
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = isDark ? '#1E293B' : '#fff';
         ctx.fill();
         ctx.strokeStyle = node.color;
         ctx.lineWidth = 2 * zoom;
@@ -266,16 +268,16 @@ const KnowledgeGraph = () => {
 
       // Label below
       if (zoom > 0.4) {
-        ctx.fillStyle = isHovered ? '#111827' : '#6B7280';
+        ctx.fillStyle = isHovered ? (isDark ? '#F1F5F9' : '#111827') : (isDark ? '#94A3B8' : '#6B7280');
         ctx.font = `${isHovered ? 'bold ' : ''}${Math.max(9, 11 * zoom)}px Inter, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
-        // White background
+        // Background behind label
         const lbl = node.label;
         const tw = ctx.measureText(lbl).width;
-        ctx.fillStyle = 'rgba(248, 250, 252, 0.85)';
+        ctx.fillStyle = isDark ? 'rgba(15, 23, 42, 0.85)' : 'rgba(248, 250, 252, 0.85)';
         ctx.fillRect(sx - tw / 2 - 2, sy + r + 4, tw + 4, 16);
-        ctx.fillStyle = isHovered ? '#111827' : '#6B7280';
+        ctx.fillStyle = isHovered ? (isDark ? '#F1F5F9' : '#111827') : (isDark ? '#94A3B8' : '#6B7280');
         ctx.fillText(lbl, sx, sy + r + 6);
       }
 

@@ -60,4 +60,17 @@ public class AiController {
             return ResponseEntity.internalServerError().body(Map.of("error", "Failed to communicate with AI service: " + e.getMessage()));
         }
     }
+
+    @PostMapping("/revision-plan/{workspaceId}")
+    public ResponseEntity<?> generateRevisionPlan(@PathVariable UUID workspaceId) {
+        try {
+            var plan = aiService.generateRevisionPlan(workspaceId);
+            return ResponseEntity.ok(plan);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(Map.of("error", "Failed to generate revision plan: " + e.getMessage()));
+        }
+    }
 }

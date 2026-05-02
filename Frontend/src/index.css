@@ -124,3 +124,91 @@ a {
   border: 1px solid var(--border-color);
   box-shadow: 0 1px 3px rgba(0,0,0,0.02);
 }
+
+/* ═══════════════════════════════════════════════
+   DARK THEME
+   ═══════════════════════════════════════════════ */
+[data-theme="dark"] {
+  --primary-blue: #3B82F6;
+  --primary-blue-hover: #2563EB;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-tertiary: #64748B;
+
+  --bg-app: #0F172A;
+  --bg-surface: #1E293B;
+  --border-color: #334155;
+
+  --error-text: #F87171;
+  --error-bg: rgba(239, 68, 68, 0.15);
+  --success-text: #34D399;
+  --success-bg: rgba(16, 185, 129, 0.15);
+  --draft-bg: #1E293B;
+  --draft-text: #94A3B8;
+  --review-bg: rgba(124, 58, 237, 0.15);
+  --review-text: #A78BFA;
+
+  --tag-blue-bg: rgba(59, 130, 246, 0.15);
+  --tag-blue-text: #60A5FA;
+  --tag-orange-bg: rgba(245, 158, 11, 0.15);
+  --tag-orange-text: #FBBF24;
+  --tag-purple-bg: rgba(139, 92, 246, 0.15);
+  --tag-purple-text: #A78BFA;
+
+  color-scheme: dark;
+}
+
+[data-theme="dark"] body {
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .card {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+[data-theme="dark"] .search-shortcut {
+  background-color: var(--bg-app);
+}
+
+[data-theme="dark"] .topbar-avatar {
+  background-color: #3B82F6;
+  color: #DBEAFE;
+}
+
+[data-theme="dark"] .text-red:hover {
+  background-color: rgba(239, 68, 68, 0.15);
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea {
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+}
+
+[data-theme="dark"] .input-field {
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+}
+
+/* Sidebar dark overrides */
+[data-theme="dark"] .sidebar {
+  background-color: var(--bg-surface);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .nav-item.active,
+[data-theme="dark"] .nav-item:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Note cards hover in dark */
+[data-theme="dark"] .note-card:hover,
+[data-theme="dark"] .plan-card:hover {
+  border-color: var(--primary-blue);
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+[data-theme="dark"] .scheduled-row:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+}

@@ -368,6 +368,8 @@ public class SidebarPanel extends JPanel {
         navContainer.add(Box.createVerticalStrut(4));
         navContainer.add(createNavItem("favorites", VectorIcon.Type.NAV_FAVORITES, "Favorites"));
         navContainer.add(Box.createVerticalStrut(4));
+        navContainer.add(createNavItem("revision", VectorIcon.Type.NAV_REVISION, "Revisions"));
+        navContainer.add(Box.createVerticalStrut(4));
         navContainer.add(createNavItem("guide", VectorIcon.Type.NAV_GUIDE, "Guide"));
     }
 

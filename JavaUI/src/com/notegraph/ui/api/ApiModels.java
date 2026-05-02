@@ -140,4 +140,42 @@ public class ApiModels {
         public IdRef() {}
         public IdRef(String id) { this.id = id; }
     }
+
+    // ── Revision ────────────────────────────────────
+    public static class RevisionPlanItem {
+        public String noteId;
+        public String title;
+        public int complexity;
+        public String urgency;
+        public List<String> suggestedDates;
+        public String reason;
+    }
+
+    public static class RevisionScheduleDto {
+        public String id;
+        public Note note;
+        public UserDto user;
+        public String scheduledAt;
+        public String status;
+        public Integer complexityScore;
+        public String aiReason;
+        public String createdAt;
+    }
+
+    public static class RevisionRequest {
+        public String noteId;
+        public String userId;
+        public String scheduledAt; // ISO-8601
+        public Integer complexityScore;
+        public String aiReason;
+
+        public RevisionRequest() {}
+        public RevisionRequest(String noteId, String userId, String scheduledAt, Integer complexityScore, String aiReason) {
+            this.noteId = noteId;
+            this.userId = userId;
+            this.scheduledAt = scheduledAt;
+            this.complexityScore = complexityScore;
+            this.aiReason = aiReason;
+        }
+    }
 }

@@ -57,7 +57,7 @@
   justify-content: center;
   font-weight: 800;
   font-size: 16px;
-  color: #fff;
+  color: var(--bg-surface);
   box-shadow: 0 4px 15px rgba(10, 102, 240, 0.4);
 }
 
@@ -94,7 +94,7 @@
   background: linear-gradient(135deg, #0A66F0, #6366F1);
   border: none;
   border-radius: 10px;
-  color: #fff;
+  color: var(--bg-surface);
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
@@ -185,7 +185,7 @@
   background: linear-gradient(135deg, #0A66F0, #6366F1);
   border: none;
   border-radius: 14px;
-  color: #fff;
+  color: var(--bg-surface);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -352,7 +352,7 @@
   border-radius: 20px;
   padding: 1px;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), transparent, rgba(236, 72, 153, 0.2));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(var(--bg-surface) 0 0) content-box, linear-gradient(var(--bg-surface) 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0;
@@ -491,7 +491,7 @@
   justify-content: center;
   font-weight: 700;
   font-size: 14px;
-  color: #fff;
+  color: var(--bg-surface);
   flex-shrink: 0;
 }
 
@@ -633,7 +633,7 @@
   animation: gradientShift 4s ease-in-out infinite;
   border: none;
   border-radius: 16px;
-  color: #fff;
+  color: var(--bg-surface);
   font-size: 18px;
   font-weight: 700;
   cursor: pointer;

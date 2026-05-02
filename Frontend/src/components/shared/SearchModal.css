@@ -16,7 +16,7 @@
 .search-modal {
   width: 900px;
   max-width: 90vw;
-  background-color: white;
+  background-color: var(--bg-surface);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -74,7 +74,7 @@
   padding: 6px 12px;
   border-radius: 6px;
   border: 1px solid var(--border-color);
-  background-color: white;
+  background-color: var(--bg-surface);
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
@@ -103,7 +103,7 @@
 }
 
 .kbd {
-  background-color: white;
+  background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: 4px;
   padding: 2px 6px;

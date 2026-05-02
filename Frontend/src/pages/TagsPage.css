@@ -9,7 +9,7 @@
 .tags-content {
   display: flex;
   flex-direction: column;
-  background-color: white;
+  background-color: var(--bg-surface);
   min-height: 500px;
 }
 
@@ -134,7 +134,7 @@
 /* Modal specific overrides */
 .create-tag-modal {
   width: 440px;
-  background-color: white;
+  background-color: var(--bg-surface);
   border-radius: 12px;
   display: flex;
   flex-direction: column;

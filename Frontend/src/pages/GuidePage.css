@@ -174,9 +174,9 @@
   font-size: 12px;
   font-weight: 600;
   color: var(--text-secondary);
-  background: var(--bg-hover);
-  padding: 3px 10px;
-  border-radius: 12px;
+  background-color: var(--primary-blue);
+  color: var(--bg-surface);
+  border-radius: 6px;
 }
 
 .gsh-chevron {

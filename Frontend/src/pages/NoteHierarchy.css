@@ -12,6 +12,18 @@
   overflow-y: hidden;
 }
 
+.hierarchy-main-area.fullscreen-mode {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background-color: var(--bg-app);
+  padding: 2rem;
+  overflow-y: auto;
+}
+
 .page-header-row {
   display: flex;
   flex-direction: column;
@@ -69,19 +81,19 @@
 
 .border-btn {
   border: 1px solid var(--border-color);
-  background-color: white;
+  background-color: var(--bg-surface);
 }
 
 /* ORGANIZATION CHART specific CSS */
 .org-chart-canvas {
   padding: 3rem 2rem;
-  background-color: #F8FAFC;
+  background-color: var(--bg-app);
   flex: 1;
   overflow: auto;
   /* Graph paper pattern */
   background-image: 
-    linear-gradient(rgba(10, 102, 240, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(10, 102, 240, 0.05) 1px, transparent 1px);
+    linear-gradient(var(--border-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
   background-size: 20px 20px;
   display: flex;
   justify-content: center;
@@ -146,7 +158,7 @@
 
 /* Org Nodes */
 .org-node {
-  background-color: white;
+  background-color: var(--bg-surface);
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.05);
   transition: transform 0.2s, box-shadow 0.2s;
@@ -234,7 +246,7 @@
 
 /* RIGHT SIDEBAR updates for the Graph details logic */
 .note-details-sidebar {
-  background-color: white;
+  background-color: var(--bg-surface);
   border-left: 1px solid var(--border-color);
   border-radius: 12px;
   border: 1px solid var(--border-color);

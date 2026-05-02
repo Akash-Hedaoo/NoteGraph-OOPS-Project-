@@ -1,7 +1,7 @@
 .export-modal {
   width: 500px;
   max-height: 85vh;
-  background-color: white;
+  background-color: var(--bg-surface);
   display: flex;
   flex-direction: column;
   border-radius: 12px;
@@ -126,7 +126,7 @@
 
 .notification-dark {
   background-color: #111827;
-  color: white;
+  color: var(--bg-surface);
 }
 
 .toast-icon-wrapper {

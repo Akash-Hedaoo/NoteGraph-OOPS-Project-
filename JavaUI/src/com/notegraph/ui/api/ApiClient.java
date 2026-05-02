@@ -184,6 +184,30 @@ public class ApiClient {
         return response.get("formatted");
     }
 
+    // ── Revision ────────────────────────────────────
+    public List<ApiModels.RevisionPlanItem> generateRevisionPlan(String wsId) throws Exception {
+        String body = post("/ai/revision-plan/" + wsId, "{}");
+        return gson.fromJson(body, new TypeToken<List<ApiModels.RevisionPlanItem>>(){}.getType());
+    }
+
+    public List<ApiModels.RevisionScheduleDto> getRevisions(String wsId, String userId) throws Exception {
+        String body = get("/revisions/workspace/" + wsId + "/user/" + userId);
+        return gson.fromJson(body, new TypeToken<List<ApiModels.RevisionScheduleDto>>(){}.getType());
+    }
+
+    public ApiModels.RevisionScheduleDto scheduleRevision(ApiModels.RevisionRequest req) throws Exception {
+        String body = post("/revisions", gson.toJson(req));
+        return gson.fromJson(body, ApiModels.RevisionScheduleDto.class);
+    }
+
+    public void updateRevisionStatus(String id, String status) throws Exception {
+        put("/revisions/" + id + "/status", "{\"status\":\"" + status + "\"}");
+    }
+
+    public void deleteRevision(String id) throws Exception {
+        delete("/revisions/" + id);
+    }
+
     // ── HTTP Helpers ────────────────────────────────
     private String get(String path) throws Exception {
         HttpRequest.Builder builder = HttpRequest.newBuilder()

@@ -63,7 +63,7 @@
   width: 100%;
   max-width: 440px;
   padding: 2.5rem;
-  background: white;
+  background: var(--bg-surface);
   border-radius: 12px;
 }
 

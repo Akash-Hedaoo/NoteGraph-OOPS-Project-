@@ -23,6 +23,7 @@ public class MainFrame extends JPanel {
     private TagsPanel tagsPanel;
     private FavoritesPanel favoritesPanel;
     private GuidePanel guidePanel;
+    private RevisionPanel revisionPanel;
     private Runnable onLogout;
 
     public MainFrame(Runnable onLogout) {
@@ -57,6 +58,7 @@ public class MainFrame extends JPanel {
         tagsPanel = new TagsPanel();
         favoritesPanel = new FavoritesPanel(this::navigateTo);
         guidePanel = new GuidePanel();
+        revisionPanel = new RevisionPanel(this::navigateTo);
 
         contentArea.add(dashboardPanel, "dashboard");
         contentArea.add(editorPanel, "editor");
@@ -65,6 +67,7 @@ public class MainFrame extends JPanel {
         contentArea.add(tagsPanel, "tags");
         contentArea.add(favoritesPanel, "favorites");
         contentArea.add(guidePanel, "guide");
+        contentArea.add(revisionPanel, "revision");
 
         rightPanel.add(contentArea, BorderLayout.CENTER);
         add(rightPanel, BorderLayout.CENTER);
@@ -89,6 +92,7 @@ public class MainFrame extends JPanel {
             case "knowledgegraph" -> knowledgeGraphPanel.refreshData();
             case "tags" -> tagsPanel.refreshData();
             case "favorites" -> favoritesPanel.refreshData();
+            case "revision" -> revisionPanel.refreshData();
         }
     }
 
