@@ -1,0 +1,105 @@
+.favorites-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.flex-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.title-icon {
+  margin-top: -4px;
+}
+
+.bg-white {
+  background-color: var(--bg-surface) !important;
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.fav-card {
+  position: relative;
+}
+
+.fav-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.active-star {
+  background-color: #FEF3C7; /* Amber-100 */
+  border-radius: 50%;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.active-star:hover {
+  background-color: #FDE68A; /* Amber-200 */
+  transform: scale(1.1);
+}
+
+.footer-flex-start {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  min-height: 400px;
+}
+
+.empty-state h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.empty-state p {
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+/* Editor CSS fix for the newly added Star button */
+.star-favorite-btn {
+  padding: 6px;
+  border-radius: 6px;
+  background-color: transparent;
+}
+
+.star-favorite-btn:hover {
+  background-color: var(--bg-app);
+}
+
+.star-favorite-btn.is-fav {
+  background-color: #FEF3C7; /* Amber bg */
+}
