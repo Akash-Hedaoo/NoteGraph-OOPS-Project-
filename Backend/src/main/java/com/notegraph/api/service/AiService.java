@@ -26,8 +26,8 @@ import java.util.*;
 @RequiredArgsConstructor
 public class AiService {
 
-    @Value("${gemini.api.key:}")
-    private String geminiApiKey;
+    @Value("${mistral.api.key:}")
+    private String mistralApiKey;
 
     private final NoteRepository noteRepository;
     private final TagRepository tagRepository;
@@ -63,42 +63,31 @@ public class AiService {
         }
         contextBuilder.append("----------------------------\n");
 
-        JsonObject root = new JsonObject();
-        JsonArray contents = new JsonArray();
+        // Build Mistral messages array
+        JsonArray messages = new JsonArray();
 
+        // System message with context
         JsonObject systemMessage = new JsonObject();
-        systemMessage.addProperty("role", "user");
-        JsonArray systemParts = new JsonArray();
-        JsonObject systemText = new JsonObject();
-        systemText.addProperty("text", contextBuilder.toString() + "\n(Acknowledge this context silently. Do not reply to it, just use it for the subsequent conversation.)");
-        systemParts.add(systemText);
-        systemMessage.add("parts", systemParts);
-        contents.add(systemMessage);
-        
-        JsonObject modelAck = new JsonObject();
-        modelAck.addProperty("role", "model");
-        JsonArray ackParts = new JsonArray();
-        JsonObject ackText = new JsonObject();
-        ackText.addProperty("text", "Understood. I will use this context to assist you. How can I help?");
-        ackParts.add(ackText);
-        modelAck.add("parts", ackParts);
-        contents.add(modelAck);
+        systemMessage.addProperty("role", "system");
+        systemMessage.addProperty("content", contextBuilder.toString());
+        messages.add(systemMessage);
 
+        // Add conversation history
         if (request.getHistory() != null) {
             for (AiChatMessage msg : request.getHistory()) {
-                JsonObject node = new JsonObject();
-                node.addProperty("role", msg.getRole());
-                JsonArray msgParts = new JsonArray();
-                JsonObject msgText = new JsonObject();
-                msgText.addProperty("text", msg.getText());
-                msgParts.add(msgText);
-                node.add("parts", msgParts);
-                contents.add(node);
+                JsonObject msgNode = new JsonObject();
+                // Mistral uses "assistant" instead of Gemini's "model"
+                String role = "model".equals(msg.getRole()) ? "assistant" : msg.getRole();
+                msgNode.addProperty("role", role);
+                msgNode.addProperty("content", msg.getText());
+                messages.add(msgNode);
             }
         }
-        root.add("contents", contents);
 
-        return callGemini(root);
+        JsonObject requestBody = new JsonObject();
+        requestBody.add("messages", messages);
+
+        return callMistral(requestBody);
     }
 
     public List<String> suggestTags(UUID workspaceId, String noteContent) throws Exception {
@@ -117,22 +106,17 @@ public class AiService {
         prompt.append("Format your response as a strict JSON array of strings, e.g. [\"Development\", \"Architecture\"]. Do not include markdown formatting.\n\n");
         prompt.append("Note Content:\n").append(noteContent);
 
-        JsonObject root = new JsonObject();
-        JsonArray contents = new JsonArray();
-        JsonObject userNode = new JsonObject();
-        JsonArray parts = new JsonArray();
-        JsonObject textNode = new JsonObject();
-        textNode.addProperty("text", prompt.toString());
-        parts.add(textNode);
-        userNode.add("parts", parts);
-        contents.add(userNode);
-        root.add("contents", contents);
-        
-        JsonObject generationConfig = new JsonObject();
-        generationConfig.addProperty("responseMimeType", "application/json");
-        root.add("generationConfig", generationConfig);
+        JsonArray messages = new JsonArray();
+        JsonObject userMessage = new JsonObject();
+        userMessage.addProperty("role", "user");
+        userMessage.addProperty("content", prompt.toString());
+        messages.add(userMessage);
 
-        String responseText = callGemini(root);
+        JsonObject requestBody = new JsonObject();
+        requestBody.add("messages", messages);
+        requestBody.addProperty("response_format", "json_object");
+
+        String responseText = callMistral(requestBody);
         
         try {
             JsonArray arrayNode = JsonParser.parseString(responseText).getAsJsonArray();
@@ -142,7 +126,21 @@ public class AiService {
             }
             return tags;
         } catch (Exception e) {
-            // Fallback
+            // Fallback: try to extract JSON array from response
+            try {
+                String trimmed = responseText.trim();
+                int start = trimmed.indexOf('[');
+                int end = trimmed.lastIndexOf(']');
+                if (start >= 0 && end > start) {
+                    String jsonArray = trimmed.substring(start, end + 1);
+                    JsonArray arr = JsonParser.parseString(jsonArray).getAsJsonArray();
+                    List<String> tags = new ArrayList<>();
+                    for (int i = 0; i < arr.size(); i++) {
+                        tags.add(arr.get(i).getAsString().trim().replaceAll("[^a-zA-Z0-9- ]", ""));
+                    }
+                    return tags;
+                }
+            } catch (Exception ignored) {}
         }
         return Collections.emptyList();
     }
@@ -154,18 +152,16 @@ public class AiService {
         prompt.append("IMPORTANT: Return ONLY the formatted text. DO NOT use Markdown asterisks or hash tags (like **bold** or # Heading), just use standard plain text formatting with newlines and bullet characters like '•'.\n\n");
         prompt.append("Note Content:\n").append(noteContent);
 
-        JsonObject root = new JsonObject();
-        JsonArray contents = new JsonArray();
-        JsonObject userNode = new JsonObject();
-        JsonArray parts = new JsonArray();
-        JsonObject textNode = new JsonObject();
-        textNode.addProperty("text", prompt.toString());
-        parts.add(textNode);
-        userNode.add("parts", parts);
-        contents.add(userNode);
-        root.add("contents", contents);
+        JsonArray messages = new JsonArray();
+        JsonObject userMessage = new JsonObject();
+        userMessage.addProperty("role", "user");
+        userMessage.addProperty("content", prompt.toString());
+        messages.add(userMessage);
 
-        return callGemini(root);
+        JsonObject requestBody = new JsonObject();
+        requestBody.add("messages", messages);
+
+        return callMistral(requestBody);
     }
 
     /**
@@ -207,25 +203,30 @@ public class AiService {
         prompt.append("\"suggestedDates\":[\"ISO-8601 datetime strings\"], \"reason\":\"explanation of why this revision schedule is optimal\"}]\n");
         prompt.append("\nDo not include any markdown formatting. Return ONLY the JSON array.");
 
-        JsonObject root = new JsonObject();
-        JsonArray contents = new JsonArray();
-        JsonObject userNode = new JsonObject();
-        JsonArray parts = new JsonArray();
-        JsonObject textNode = new JsonObject();
-        textNode.addProperty("text", prompt.toString());
-        parts.add(textNode);
-        userNode.add("parts", parts);
-        contents.add(userNode);
-        root.add("contents", contents);
+        JsonArray messages = new JsonArray();
+        JsonObject userMessage = new JsonObject();
+        userMessage.addProperty("role", "user");
+        userMessage.addProperty("content", prompt.toString());
+        messages.add(userMessage);
 
-        JsonObject generationConfig = new JsonObject();
-        generationConfig.addProperty("responseMimeType", "application/json");
-        root.add("generationConfig", generationConfig);
+        JsonObject requestBody = new JsonObject();
+        requestBody.add("messages", messages);
 
-        String responseText = callGemini(root);
+        String responseText = callMistral(requestBody);
 
         try {
-            JsonArray arrayNode = JsonParser.parseString(responseText).getAsJsonArray();
+            // Try to parse directly as JSON array
+            String trimmed = responseText.trim();
+            if (!trimmed.startsWith("[")) {
+                // Extract JSON array if wrapped in other text
+                int start = trimmed.indexOf('[');
+                int end = trimmed.lastIndexOf(']');
+                if (start >= 0 && end > start) {
+                    trimmed = trimmed.substring(start, end + 1);
+                }
+            }
+            
+            JsonArray arrayNode = JsonParser.parseString(trimmed).getAsJsonArray();
             List<RevisionPlanItem> plan = new ArrayList<>();
             for (int i = 0; i < arrayNode.size(); i++) {
                 JsonObject obj = arrayNode.get(i).getAsJsonObject();
@@ -252,26 +253,30 @@ public class AiService {
         }
     }
 
-    private String callGemini(JsonObject requestBody) throws Exception {
-        if (geminiApiKey == null || geminiApiKey.trim().isEmpty() || "YOUR_API_KEY_HERE".equals(geminiApiKey)) {
-            throw new IllegalArgumentException("Gemini API key is not configured. Please add GEMINI_API_KEY to your environment variables or application.yml.");
+    private String callMistral(JsonObject requestBody) throws Exception {
+        if (mistralApiKey == null || mistralApiKey.trim().isEmpty() || "YOUR_API_KEY_HERE".equals(mistralApiKey)) {
+            throw new IllegalArgumentException("Mistral API key is not configured. Please add MISTRAL_API_KEY to your environment variables or application.yml.");
         }
 
-        String jsonBody = gson.toJson(requestBody);
-        
-        // Dynamic Runtime Fallback List of Gemini Models
+        // Dynamic Runtime Fallback List of Mistral Models
         String[] fallbackModels = {
-            "gemini-1.5-flash",
-            "gemini-2.5-flash",
-            "gemini-1.5-pro",
-            "gemini-1.0-pro"
+            "mistral-small-latest",
+            "mistral-large-latest",
+            "open-mistral-nemo"
         };
 
         for (int i = 0; i < fallbackModels.length; i++) {
             String model = fallbackModels[i];
+            
+            // Set the model in the request body
+            requestBody.addProperty("model", model);
+
+            String jsonBody = gson.toJson(requestBody);
+
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + geminiApiKey))
+                    .uri(URI.create("https://api.mistral.ai/v1/chat/completions"))
                     .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + mistralApiKey)
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();
 
@@ -284,18 +289,18 @@ public class AiService {
                 }
                 
                 if (response.statusCode() >= 400) {
-                    // Do not fail entirely if one model breaks due to a bad schema or formatting constraint, try the next!
+                    // Do not fail entirely if one model breaks, try the next!
                     if (i < fallbackModels.length - 1) continue;
-                    throw new RuntimeException("Gemini API error (" + response.statusCode() + "): " + response.body());
+                    throw new RuntimeException("Mistral API error (" + response.statusCode() + "): " + response.body());
                 }
 
                 JsonObject responseNode = JsonParser.parseString(response.body()).getAsJsonObject();
-                JsonArray candidates = responseNode.getAsJsonArray("candidates");
-                if (candidates != null && candidates.size() > 0) {
-                    JsonArray parts = candidates.get(0).getAsJsonObject()
-                            .getAsJsonObject("content").getAsJsonArray("parts");
-                    if (parts != null && parts.size() > 0) {
-                        return parts.get(0).getAsJsonObject().get("text").getAsString();
+                JsonArray choices = responseNode.getAsJsonArray("choices");
+                if (choices != null && choices.size() > 0) {
+                    JsonObject message = choices.get(0).getAsJsonObject()
+                            .getAsJsonObject("message");
+                    if (message != null && message.has("content")) {
+                        return message.get("content").getAsString();
                     }
                 }
             } catch (Exception e) {

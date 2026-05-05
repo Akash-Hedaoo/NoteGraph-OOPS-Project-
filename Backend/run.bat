@@ -4,6 +4,9 @@ REM  NoteGraph Spring Boot Backend — Run Script
 REM  Requires: Java 17+ (JDK), Maven Wrapper
 REM ============================================
 
+REM Always run from the Backend directory (where pom.xml lives)
+cd /d "%~dp0"
+
 echo.
 echo ============================================
 echo   NoteGraph Backend  (Spring Boot)
