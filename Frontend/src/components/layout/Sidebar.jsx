@@ -105,7 +105,7 @@ const Sidebar = () => {
     <aside className="sidebar">
       {/* Brand & User Setup Area */}
       <div className="sidebar-header">
-        <div className="brand">
+        <div className="brand" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
           <div className="logo-icon-small">
             <svg viewBox="0 0 24 24" fill="var(--primary-blue)" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
               <path d="M12 2L2 7L12 12L22 7L12 2Z" />

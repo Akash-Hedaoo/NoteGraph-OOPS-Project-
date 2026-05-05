@@ -40,6 +40,7 @@ const DashboardOverview = () => {
   const { user, workspaceId } = useAuth();
   const [notes, setNotes] = useState([]);
   const [activities, setActivities] = useState([]);
+  const [stats, setStats] = useState({ totalNotes: 0, favNotes: 0 });
   const [loading, setLoading] = useState(true);
   const [confirmAction, setConfirmAction] = useState(null);
 
@@ -50,7 +51,12 @@ const DashboardOverview = () => {
         
         // Fetch recent notes for workspace
         const notesRes = await api.get(`/notes/workspace/${workspaceId}`);
-        setNotes(notesRes.data.slice(0, 3)); // Only show top 3 on dashboard
+        const allNotes = notesRes.data;
+        setStats({
+          totalNotes: allNotes.length,
+          favNotes: allNotes.filter(n => n.favorite).length
+        });
+        setNotes(allNotes.slice(0, 3)); // Only show top 3 on dashboard
         
         // Fetch recent activities
         const activityRes = await api.get(`/activity/user/${user.id}`);
@@ -75,6 +81,10 @@ const DashboardOverview = () => {
         try {
           await api.delete(`/notes/${noteId}`);
           setNotes(notes.filter(n => n.id !== noteId));
+          setStats(prev => ({
+            ...prev,
+            totalNotes: Math.max(0, prev.totalNotes - 1)
+          }));
         } catch (err) {
           console.error("Failed to delete note", err);
         }
@@ -111,9 +121,9 @@ const DashboardOverview = () => {
 
       {/* Metrics Row */}
       <div className="metrics-grid">
-        <MetricCard title="Total Notes" value={loading ? "..." : notes.length} icon={FileText} trendUp={true} />
+        <MetricCard title="Total Notes" value={loading ? "..." : stats.totalNotes} icon={FileText} trendUp={true} />
         <MetricCard title="Recent Edits" value={loading ? "..." : activities.filter(a => a.action === 'edited').length} icon={Edit3} trendUp={true} />
-        <MetricCard title="Favorites" value={loading ? "..." : notes.filter(n => n.favorite).length} icon={Share2} trendUp={true} />
+        <MetricCard title="Favorites" value={loading ? "..." : stats.favNotes} icon={Share2} trendUp={true} />
         <MetricCard title="Archived" value="0" icon={Archive} />
       </div>
 
