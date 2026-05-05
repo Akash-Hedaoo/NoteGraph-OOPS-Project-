@@ -44,6 +44,18 @@ Built as an OOP Project demonstrating clean architecture, CRUD operations, JWT a
 - Quick-start banner and step-by-step instructions
 - Covers all features: Workspaces, Notes, Tags, Graph, Favorites, and Pro Tips
 
+### 🤖 AI Revision Scheduler
+- **Ebbinghaus Forgetting Curve** — AI analyzes note complexity and creation date to generate optimal spaced-repetition revision schedules
+- **Mistral AI Integration** — uses Mistral LLM with automatic model fallback (`mistral-small` → `mistral-medium` → `mistral-large`) for reliability
+- **Complexity Scoring** — each note is rated 1–10 for difficulty; higher complexity notes get more frequent revision intervals
+- **Urgency Levels** — revisions are tagged as HIGH (overdue), MEDIUM (due soon), or LOW (on schedule)
+- **Auto-Scheduling** — one-click "Generate AI Plan" creates revision entries in the database with suggested dates
+- **Email Reminders** — a background cron task (`RevisionSchedulerTask`) checks every 60 seconds for due revisions and sends styled HTML email reminders via SMTP
+- **Manual Management** — mark revisions as Completed, Skip, or Delete; manually schedule custom revision dates
+- **AI Chat Assistant** — contextual AI chat in the editor that references your knowledge graph for intelligent responses
+- **AI Tag Suggestions** — automatically suggest relevant tags based on note content
+- **AI Content Formatting** — clean up messy notes with AI-powered text formatting
+
 ### 🔐 Authentication
 - JWT-based authentication with Spring Security
 - User registration and login
@@ -77,6 +89,8 @@ Built as an OOP Project demonstrating clean architecture, CRUD operations, JWT a
 | Spring Data JPA | — | Database ORM |
 | JWT (jjwt) | 0.11.5 | Token-based auth |
 | MySQL | 8.0 | Database |
+| Mistral AI | — | LLM for revision planning, tag suggestions, chat & formatting |
+| Spring Mail | — | SMTP email reminders for revision schedules |
 | Lombok | — | Boilerplate reduction |
 | Java | 17 | Language |
 
@@ -94,14 +108,21 @@ NoteGraph-OOPS-Project/
 │   │   │   ├── TagController.java
 │   │   │   ├── WorkspaceController.java
 │   │   │   ├── GraphController.java
+│   │   │   ├── AiController.java
+│   │   │   ├── RevisionController.java
 │   │   │   └── ActivityController.java
 │   │   ├── service/                  # Business Logic
+│   │   │   ├── AiService.java        # Mistral AI integration
+│   │   │   ├── RevisionService.java  # Revision CRUD
+│   │   │   ├── RevisionSchedulerTask.java  # Cron email reminders
+│   │   │   └── EmailService.java     # SMTP email sender
 │   │   ├── repository/              # JPA Repositories
 │   │   ├── domain/                  # Entity Models
 │   │   │   ├── User.java
 │   │   │   ├── Workspace.java
 │   │   │   ├── Note.java
 │   │   │   ├── Tag.java
+│   │   │   ├── RevisionSchedule.java
 │   │   │   └── ActivityLog.java
 │   │   ├── dto/                     # Data Transfer Objects
 │   │   └── security/               # JWT & Security Config
@@ -234,6 +255,23 @@ cd JavaUI
 |--------|----------|-------------|
 | GET | `/api/graph/{workspaceId}` | Get graph data for workspace |
 
+### AI
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/ai/chat/{workspaceId}` | AI chat with knowledge graph context |
+| POST | `/api/ai/tags/suggest/{workspaceId}` | AI-powered tag suggestions |
+| POST | `/api/ai/format` | AI content formatting |
+| POST | `/api/ai/revision-plan/{workspaceId}` | Generate revision plan (read-only) |
+| POST | `/api/ai/revision-plan/{workspaceId}/user/{userId}` | Generate & auto-schedule revision plan |
+
+### Revisions
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/revisions/workspace/{wsId}/user/{userId}` | Get scheduled revisions |
+| POST | `/api/revisions` | Manually schedule a revision |
+| PUT | `/api/revisions/{id}/status` | Update revision status (COMPLETED/SKIPPED) |
+| DELETE | `/api/revisions/{id}` | Delete a revision |
+
 ---
 
 ## 🧪 OOP Principles Demonstrated
@@ -245,6 +283,9 @@ cd JavaUI
 | **Polymorphism** | `UserDetailsService` implementation for Spring Security |
 | **Abstraction** | Repository interfaces abstracting database operations |
 | **Composition** | `Note` contains `Set<Tag>`, `Workspace` contains `User` owner |
+| **Strategy Pattern** | AI model fallback chain (`mistral-small` → `medium` → `large`) in `AiService` |
+| **Observer Pattern** | `@Scheduled` cron task observes pending revisions and triggers email actions |
+| **Builder Pattern** | `RevisionSchedule.builder()` for constructing revision entities |
 | **SRP** | Separate Controller → Service → Repository layers |
 
 ---
