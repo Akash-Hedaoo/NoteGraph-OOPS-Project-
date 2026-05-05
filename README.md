@@ -62,6 +62,13 @@ Built as an OOP Project demonstrating clean architecture, CRUD operations, JWT a
 | Axios | 1.13 | HTTP client |
 | Lucide React | 0.577 | Icon library |
 
+### Desktop Client (Java UI)
+| Technology | Purpose |
+|-----------|---------|
+| Java Swing | Native desktop UI framework |
+| FlatLaf | Modern dark/light look and feel |
+| Gson | JSON parsing for API responses |
+
 ### Backend
 | Technology | Version | Purpose |
 |-----------|---------|---------|
@@ -116,6 +123,15 @@ NoteGraph-OOPS-Project/
 │   │   ├── context/                 # Auth Context
 │   │   └── services/                # API Service (Axios)
 │   └── package.json
+│
+├── JavaUI/                           # Java Swing Desktop Client
+│   ├── src/com/notegraph/ui/
+│   │   ├── api/                     # HTTP client & models
+│   │   ├── components/              # Custom UI components
+│   │   ├── layout/                  # MainFrame, Sidebar, TopBar
+│   │   └── pages/                   # Feature panels
+│   ├── lib/                         # External JARs (FlatLaf, Gson)
+│   └── run.bat                      # Launch script
 └── README.md
 ```
 
@@ -165,6 +181,15 @@ npm run dev
 ### 4. Open the App
 
 Navigate to `http://localhost:5173` in your browser. Register a new account and start creating notes!
+
+### 5. (Alternative) Run Java Desktop Client
+
+Instead of the web frontend, you can use the native Java desktop application:
+```bash
+cd JavaUI
+.\run.bat
+```
+> Note: Ensure the Spring Boot backend is already running on port 8080.
 
 ---
 
