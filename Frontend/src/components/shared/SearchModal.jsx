@@ -13,6 +13,7 @@ const SearchModal = ({ isOpen, onClose }) => {
   const [query, setQuery] = useState('');
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('all');
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
@@ -31,7 +32,6 @@ const SearchModal = ({ isOpen, onClose }) => {
           setLoading(false);
         }
       };
-      // Run once per open state mounting to cache the list
       fetchNotes();
     }
   }, [isOpen, workspaceId]);
@@ -45,17 +45,35 @@ const SearchModal = ({ isOpen, onClose }) => {
     return tmp.textContent || tmp.innerText || "";
   };
 
-  const filteredNotes = notes.filter(n => {
-    if (!query.trim()) return true;
+  let resultNotes = [...notes];
+
+  // Apply search query and tag filter
+  if (query.trim()) {
     const q = query.toLowerCase();
-    return (n.title || '').toLowerCase().includes(q) 
-        || stripHtml(n.content).toLowerCase().includes(q)
-        || (n.tags && n.tags.some(t => t.name.toLowerCase().includes(q)));
-  }).slice(0, 10); // Limit to top 10 matches for preview
+    resultNotes = resultNotes.filter(n => {
+      if (activeFilter === 'tags') {
+        return n.tags && n.tags.some(t => t.name.toLowerCase().includes(q));
+      }
+      return (n.title || '').toLowerCase().includes(q) 
+          || stripHtml(n.content).toLowerCase().includes(q)
+          || (n.tags && n.tags.some(t => t.name.toLowerCase().includes(q)));
+    });
+  }
+
+  // Apply sorting
+  if (activeFilter === 'date') {
+    resultNotes.sort((a, b) => new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime());
+  }
+
+  const filteredNotes = resultNotes.slice(0, 10); // Limit to top 10 matches for preview
 
   const handleResultClick = (id) => {
     navigate(`/editor/${id}`);
     onClose();
+  };
+
+  const toggleFilter = (filter) => {
+    setActiveFilter(prev => prev === filter ? 'all' : filter);
   };
 
   return (
@@ -75,14 +93,17 @@ const SearchModal = ({ isOpen, onClose }) => {
         </div>
 
         <div className="search-filters-row">
-           <div className="filter-pill active" title="Tag filtering coming soon">
-             <div className="filter-color blue"></div> Tags <ChevronDown size={14} />
+           <div 
+             className={`filter-pill ${activeFilter === 'tags' ? 'active' : ''}`} 
+             onClick={() => toggleFilter('tags')}
+           >
+             <div className={`filter-color ${activeFilter === 'tags' ? 'blue' : 'gray'}`} style={activeFilter !== 'tags' ? {backgroundColor: 'var(--text-tertiary)', width: 12, height: 12, borderRadius: 4} : {}}></div> Tags
            </div>
-           <div className="filter-pill" title="Folder filtering coming soon">
-             <Folder size={14} className="text-secondary" /> Folders <ChevronDown size={14} />
-           </div>
-           <div className="filter-pill" title="Date filtering coming soon">
-             <Calendar size={14} className="text-secondary" /> Date Modified <ChevronDown size={14} />
+           <div 
+             className={`filter-pill ${activeFilter === 'date' ? 'active' : ''}`}
+             onClick={() => toggleFilter('date')}
+           >
+             <Calendar size={14} className={activeFilter === 'date' ? 'text-blue' : 'text-secondary'} /> Date Modified
            </div>
            
            <div className="keyboard-hints">

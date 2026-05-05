@@ -65,7 +65,10 @@ const RevisionPage = () => {
   const updateStatus = async (id, newStatus) => {
     try {
       await api.put(`/revisions/${id}/status`, { status: newStatus });
-      loadScheduledRevisions();
+      // Keep in local state for the duration of the session
+      setScheduledRevisions(prev => prev.map(rev => 
+        rev.id === id ? { ...rev, status: newStatus } : rev
+      ));
     } catch (err) {
       console.error('Failed to update', err);
     }

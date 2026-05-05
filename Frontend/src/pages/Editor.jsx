@@ -38,6 +38,7 @@ const Editor = () => {
   const [suggestedTags, setSuggestedTags] = useState([]);
   const [isSuggestingTags, setIsSuggestingTags] = useState(false);
   const [isAiFormatting, setIsAiFormatting] = useState(false);
+  const [isShared, setIsShared] = useState(false);
 
   const [isWsDropdownOpen, setIsWsDropdownOpen] = useState(false);
   const [isSectionDropdownOpen, setIsSectionDropdownOpen] = useState(false);
@@ -244,6 +245,9 @@ const Editor = () => {
         message: userMsg,
         history: aiMessages.map(m => ({ role: m.role, content: m.text })),
         currentNoteContent: editorRef.current?.innerText || '',
+        currentNoteTitle: titleRef.current?.innerText || '',
+        currentNoteId: noteIdRef.current,
+        currentTags: tags.map(t => t.id)
       });
       setAiMessages(prev => [...prev, { role: 'ai', text: res.data.answer }]);
     } catch (e) {
@@ -348,6 +352,12 @@ const Editor = () => {
     });
   };
 
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setIsShared(true);
+    setTimeout(() => setIsShared(false), 2000);
+  };
+
   return (
     <div className="editor-page-container">
       {/* Top Action Bar */}
@@ -393,8 +403,8 @@ const Editor = () => {
              <button className="btn-outline group-left" onClick={() => setIsExportOpen(true)}>
                Export <ChevronDown size={14} style={{ marginLeft: '4px' }} />
              </button>
-             <button className="btn-primary group-right">
-                Share
+             <button className="btn-primary group-right" onClick={handleShare}>
+                {isShared ? 'Link Copied!' : 'Share'}
              </button>
            </div>
            

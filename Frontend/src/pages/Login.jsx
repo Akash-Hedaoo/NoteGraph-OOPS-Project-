@@ -130,20 +130,6 @@ const Login = () => {
             </button>
           </form>
 
-          <div className="divider">
-            <span>Or continue with</span>
-          </div>
-
-          <div className="social-login">
-            <button className="btn-outline social-btn">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" width="18" height="18" />
-              Google
-            </button>
-            <button className="btn-outline social-btn">
-              <Github size={18} />
-              GitHub
-            </button>
-          </div>
 
           <div className="signup-prompt">
             {isLogin ? "Don't have an account? " : "Already have an account? "}

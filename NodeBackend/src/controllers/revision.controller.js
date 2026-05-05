@@ -21,7 +21,8 @@ exports.getRevisions = async (req, res) => {
         const schedules = await prisma.revision_schedules.findMany({
             where: {
                 user_id: userIdBuffer,
-                notes: { workspace_id: wsIdBuffer }
+                notes: { workspace_id: wsIdBuffer },
+                status: { in: ['PENDING', 'SENT'] }
             },
             include: { notes: true },
             orderBy: { scheduled_at: 'asc' }

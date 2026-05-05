@@ -21,7 +21,8 @@ exports.getWorkspaceTags = async (req, res) => {
 
 exports.createTag = async (req, res) => {
     try {
-        const { name, color, workspaceId } = req.body;
+        const { name, color } = req.body;
+        const workspaceId = req.body.workspaceId || req.body.workspace?.id;
         const workspaceIdBuffer = uuidToBuffer(workspaceId);
 
         const tag = await prisma.tags.create({
