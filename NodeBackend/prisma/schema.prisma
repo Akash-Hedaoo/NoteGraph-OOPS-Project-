@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model activity_logs {
+  id          Bytes     @id @db.Binary(16)
+  action      String    @db.VarChar(255)
+  created_at  DateTime? @db.DateTime(6)
+  target_id   Bytes     @db.Binary(16)
+  target_name String    @db.VarChar(255)
+  target_type String    @db.VarChar(255)
+  user_id     Bytes     @db.Binary(16)
+  users       users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK5bm1lt4f4eevt8lv2517soakd")
+
+  @@index([user_id], map: "FK5bm1lt4f4eevt8lv2517soakd")
+}
+
+model folders {
+  id           Bytes      @id @db.Binary(16)
+  created_at   DateTime?  @db.DateTime(6)
+  name         String     @db.VarChar(255)
+  updated_at   DateTime?  @db.DateTime(6)
+  workspace_id Bytes      @db.Binary(16)
+  workspaces   workspaces @relation(fields: [workspace_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKl9l9k5aegfjmgij3y1f79tynh")
+  notes        notes[]
+
+  @@index([workspace_id], map: "FKl9l9k5aegfjmgij3y1f79tynh")
+}
+
+model note_tags {
+  note_id Bytes @db.Binary(16)
+  tag_id  Bytes @db.Binary(16)
+  tags    tags  @relation(fields: [tag_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK8babdwu6uqiu4rdkeuy8dkna0")
+  notes   notes @relation(fields: [note_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKb15yxop81senc5xs5tjrsy4k4")
+
+  @@id([note_id, tag_id])
+  @@index([tag_id], map: "FK8babdwu6uqiu4rdkeuy8dkna0")
+}
+
+model notes {
+  id                 Bytes                @id @db.Binary(16)
+  content            String?              @db.LongText
+  created_at         DateTime?            @db.DateTime(6)
+  is_favorite        Boolean              @db.Bit(1)
+  status             notes_status
+  title              String               @db.VarChar(255)
+  updated_at         DateTime?            @db.DateTime(6)
+  folder_id          Bytes?               @db.Binary(16)
+  owner_id           Bytes                @db.Binary(16)
+  workspace_id       Bytes                @db.Binary(16)
+  note_tags          note_tags[]
+  folders            folders?             @relation(fields: [folder_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK436tfv4rr5yyeb9kauihnjkja")
+  workspaces         workspaces           @relation(fields: [workspace_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK5gwb4qvlwl3mf27pxm3dyoyex")
+  users              users                @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK5n5jgcd6tqt248r97q0yrt3xp")
+  revision_schedules revision_schedules[]
+
+  @@index([folder_id], map: "FK436tfv4rr5yyeb9kauihnjkja")
+  @@index([workspace_id], map: "FK5gwb4qvlwl3mf27pxm3dyoyex")
+  @@index([owner_id], map: "FK5n5jgcd6tqt248r97q0yrt3xp")
+}
+
+model revision_schedules {
+  id               Bytes                     @id @db.Binary(16)
+  ai_reason        String?                   @db.Text
+  complexity_score Int?
+  created_at       DateTime?                 @db.DateTime(6)
+  scheduled_at     DateTime                  @db.DateTime(6)
+  status           revision_schedules_status
+  note_id          Bytes                     @db.Binary(16)
+  user_id          Bytes                     @db.Binary(16)
+  notes            notes                     @relation(fields: [note_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKkfbw0hf4tnunn16fyvjprb2y1")
+  users            users                     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKl46aepvpo0mnhkv3fqwb86j5i")
+
+  @@index([note_id], map: "FKkfbw0hf4tnunn16fyvjprb2y1")
+  @@index([user_id], map: "FKl46aepvpo0mnhkv3fqwb86j5i")
+}
+
+model tags {
+  id           Bytes       @id @db.Binary(16)
+  color        String      @db.VarChar(255)
+  name         String      @db.VarChar(255)
+  workspace_id Bytes       @db.Binary(16)
+  note_tags    note_tags[]
+  workspaces   workspaces  @relation(fields: [workspace_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK1o0rb9term6ckug308ppd7331")
+
+  @@index([workspace_id], map: "FK1o0rb9term6ckug308ppd7331")
+}
+
+model users {
+  id                 Bytes                @id @db.Binary(16)
+  created_at         DateTime?            @db.DateTime(6)
+  email              String               @unique(map: "UK6dotkott2kjsp8vw4d0m25fb7") @db.VarChar(255)
+  name               String               @db.VarChar(255)
+  password_hash      String               @db.VarChar(255)
+  updated_at         DateTime?            @db.DateTime(6)
+  activity_logs      activity_logs[]
+  notes              notes[]
+  revision_schedules revision_schedules[]
+  workspaces         workspaces[]
+}
+
+model workspaces {
+  id         Bytes     @id @db.Binary(16)
+  created_at DateTime? @db.DateTime(6)
+  name       String    @db.VarChar(255)
+  updated_at DateTime? @db.DateTime(6)
+  owner_id   Bytes     @db.Binary(16)
+  folders    folders[]
+  notes      notes[]
+  tags       tags[]
+  users      users     @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK58ks96jjlsbhsh21cen7hr59h")
+
+  @@index([owner_id], map: "FK58ks96jjlsbhsh21cen7hr59h")
+}
+
+enum notes_status {
+  COMPLETED
+  DRAFT
+  IN_REVIEW
+}
+
+enum revision_schedules_status {
+  COMPLETED
+  PENDING
+  SENT
+  SKIPPED
+}
